@@ -34,39 +34,16 @@ class CommandScheduler final : public SendableBase {
 
   void Run();
 
-  void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems) {
-    for (auto* subsystem : subsystems) {
-      m_subsystems[subsystem] = nullptr;
-    }
-  }
+  void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
 
-  void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems) {
-    for (auto* subsystem : subsystems) {
-      auto s = m_subsystems.find(subsystem);
-      if (s != m_subsystems.end()) {
-        m_subsystems.erase(s);
-      }
-    }
-  }
+  void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
 
-  void SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand) {
-    m_subsystems[subsystem] = defaultCommand;
-  }
+  void SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand);
 
-  Command* GetDefaultCommand(Subsystem* subsystem) const {
-    auto find = m_subsystems.find(subsystem);
-    if (find != m_subsystems.end()) {
-      return find->second;
-    }
-    return nullptr;
-  }
+  Command* GetDefaultCommand(Subsystem* subsystem) const;
 
   void CancelCommands(std::initializer_list<Command*> commands);
-  void CancelAll() {
-    for (auto&& command : m_scheduledCommands) {
-      CancelCommands({command.first});
-    }
-  }
+  void CancelAll();
 
   double TimeSinceScheduled(Command* command) const ;
   bool IsScheduled(std::initializer_list<Command*> commands) const;

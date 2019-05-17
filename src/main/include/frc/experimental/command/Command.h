@@ -20,7 +20,7 @@ class Command {
   virtual void Execute();
   virtual void End(bool interrupted);
   virtual bool IsFinished() { return false; }
-  virtual void GetRequirements(wpi::SmallVectorImpl<Subsystem*> requirements) const = 0;
+  virtual void GetRequirements(wpi::SmallVectorImpl<Subsystem*>& requirements) const = 0;
   Command* WithTimeout(double seconds) const;
   Command* InterruptOn(std::function<bool()> condition) const;
   Command* WhenFinished(std::function<void()> toRun) const;

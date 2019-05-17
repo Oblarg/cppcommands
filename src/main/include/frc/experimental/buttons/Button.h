@@ -19,6 +19,7 @@ class Button : public Trigger {
 
   Button* WhenReleased(Command* command, bool interruptible);
   Button* WhenReleased(Command* command);
+  Button* WhenReleased(std::function<void()> toRun);
 
   Button* ToggleWhenPressed(Command* command, bool interruptible);
   Button* ToggleWhenPressed(Command* command);

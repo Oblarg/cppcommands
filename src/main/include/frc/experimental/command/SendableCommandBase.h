@@ -10,7 +10,7 @@ class SendableCommandBase : public Sendable, public Command {
  public:
   void AddRequirements(std::initializer_list<Subsystem*> requirements);
 
-  void GetRequirements(wpi::SmallVectorImpl<Subsystem*> requirements) const override;
+  void GetRequirements(wpi::SmallVectorImpl<Subsystem*>& requirements) const override;
 
   void SetName(const wpi::Twine& name) override {
     m_name = name.str();

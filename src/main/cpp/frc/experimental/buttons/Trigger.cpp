@@ -2,6 +2,7 @@
 #include <frc/experimental/command/CommandScheduler.h>
 #include <frc/experimental/command/Command.h>
 #include <frc/experimental/command/InstantCommand.h>
+#include <frc/smartdashboard/SendableBuilder.h>
 
 using namespace frc::experimental;
 
@@ -57,10 +58,6 @@ Trigger* Trigger::WhileActiveOnce(Command* command, bool interruptible) {
   return this;
 }
 
-Trigger* Trigger::WhileActiveOnce(std::function<void()> toRun) {
-  return WhileActiveOnce(new InstantCommand(std::move(toRun), {}));
-}
-
 Trigger* Trigger::WhenInactive(Command* command, bool interruptible) {
   CommandScheduler::GetInstance().AddButton([pressedLast = Grab(), this, command, interruptible]() mutable {
     bool pressed = Grab();
@@ -106,4 +103,12 @@ Trigger* Trigger::CancelWhenActive(Command* command) {
     pressedLast = pressed;
   });
   return this;
+}
+
+void Trigger::InitSendable(frc::SendableBuilder& builder) {
+  builder.SetSmartDashboardType("Button");
+  builder.SetSafeState([this]{ m_sendablePressed = false; });
+  builder.AddBooleanProperty("pressed", [this]{return Grab();}, [this](bool value){
+    m_sendablePressed = value;
+  });
 }
