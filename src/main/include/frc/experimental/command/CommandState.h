@@ -1,11 +1,10 @@
 #pragma once
 
-#include <atomic>
-
 namespace frc {
 namespace experimental {
 class CommandState final {
  public:
+  CommandState() = default;
   explicit CommandState(bool interruptible) : m_interruptible{interruptible} {
     StartTiming();
     StartRunning();
@@ -14,10 +13,10 @@ class CommandState final {
   void StartTiming();
   void StartRunning();
   bool IsInterruptible() const { return m_interruptible; }
-  double TimeSinceInitialized();
+  double TimeSinceInitialized() const;
  private:
-  std::atomic<double> m_startTime;
-  const bool m_interruptible;
+  double m_startTime = -1;
+  bool m_interruptible;
 };
 }
 }

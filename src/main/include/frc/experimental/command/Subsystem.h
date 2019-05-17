@@ -7,10 +7,10 @@ class Subsystem {
  public:
   ~Subsystem() = default;
   virtual void Periodic();
-  virtual void SetDefaultCommand(Command* command);
+  virtual void SetDefaultCommand(Command* defaultCommand);
   virtual Command* GetDefaultCommand() const;
   virtual Command* GetCurrentCommand() const;
-  virtual void Register() const;
+  virtual void Register();
 };
 }
 }

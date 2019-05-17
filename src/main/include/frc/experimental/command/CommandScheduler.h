@@ -5,6 +5,7 @@
 #include <wpi/SmallSet.h>
 #include <networktables/NetworkTableEntry.h>
 #include <frc/RobotState.h>
+#include <unordered_map>
 #include "CommandState.h"
 
 namespace frc {
@@ -16,7 +17,7 @@ class CommandScheduler final : public SendableBase {
   static CommandScheduler& GetInstance();
   using Action = std::function<void(const Command&)>;
 
-  void AddButton(std::function<void()>&& button) {
+  void AddButton(std::function<void()> button) {
     m_buttons.emplace_back(std::move(button));
   }
 
@@ -24,15 +25,24 @@ class CommandScheduler final : public SendableBase {
     m_buttons.clear();
   }
 
-  void ScheduleCommand(Command* command, bool interruptible);
+  void Schedule(bool interruptible, Command* command);
+  void Schedule(bool interruptible, std::initializer_list<Command*> commands) {
+    for (auto command : commands) {
+      Schedule(interruptible, command);
+    }
+  }
 
-  void ScheduleCommands(bool interruptible, std::initializer_list<Command*> commands) {
-    for (auto&& command : commands) {
-      ScheduleCommand(command, interruptible);
+    void Schedule(std::initializer_list<Command*> commands) {
+    for (auto command : commands) {
+      Schedule(true, command);
     }
   }
 
   void Run();
+
+    void RegisterSubsystem(Subsystem* subsystem);
+
+  void UnregisterSubsystem(Subsystem* subsystem);
 
   void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
 
@@ -40,13 +50,21 @@ class CommandScheduler final : public SendableBase {
 
   void SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand);
 
-  Command* GetDefaultCommand(Subsystem* subsystem) const;
+  Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
-  void CancelCommands(std::initializer_list<Command*> commands);
+  void Cancel(Command* command);
+  void Cancel(std::initializer_list<Command*> commands) {
+    for (auto command : commands) {
+      Cancel(command);
+    }
+  }
   void CancelAll();
 
-  double TimeSinceScheduled(Command* command) const ;
-  bool IsScheduled(std::initializer_list<Command*> commands) const;
+  double TimeSinceScheduled(const Command* command) const;
+  bool IsScheduled(std::initializer_list<const Command*> commands) const;
+  bool IsScheduled(const Command* command) const;
+
+  Command* Requiring(const Subsystem* subsystem) const;
 
   void Disable() { m_disabled = true; }
   void Enable() { m_disabled = false; }

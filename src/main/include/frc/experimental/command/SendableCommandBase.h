@@ -28,7 +28,7 @@ class SendableCommandBase : public Sendable, public Command {
     m_subsystem = subsystem.str();
   }
 
-  void InitSendable(SendableBuilder& builder) override;
+  void InitSendable(frc::SendableBuilder& builder) override;
 
 
  protected:
