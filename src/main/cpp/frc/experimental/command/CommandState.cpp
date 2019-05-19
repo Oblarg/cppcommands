@@ -10,5 +10,5 @@ using namespace frc::experimental;
       m_startTime = -1;
   }
   double CommandState::TimeSinceInitialized() const {
-      return frc::Timer::GetFPGATimestamp() - m_startTime;
+      return m_startTime != -1 ? frc::Timer::GetFPGATimestamp() - m_startTime : -1
   }
