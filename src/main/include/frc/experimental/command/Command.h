@@ -2,6 +2,7 @@
 
 #include <wpi/Twine.h>
 #include <wpi/SmallVector.h>
+#include <set>
 
 namespace frc {
 namespace experimental {
@@ -20,7 +21,7 @@ class Command {
   virtual void Execute();
   virtual void End(bool interrupted);
   virtual bool IsFinished() { return false; }
-  virtual void GetRequirements(wpi::SmallVectorImpl<Subsystem*>& requirements) const = 0;
+  virtual const std::set<Subsystem*>& GetRequirements() const = 0;
   Command* WithTimeout(double seconds) const;
   Command* InterruptOn(std::function<bool()> condition) const;
   Command* WhenFinished(std::function<void()> toRun) const;

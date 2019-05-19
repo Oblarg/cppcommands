@@ -31,7 +31,7 @@ class BlockingScheduleCommand : public SendableCommandBase {
     }
   }
 
-  void IsFinished() override {
+  bool IsFinished() override {
     return m_finished;
   }
  private:

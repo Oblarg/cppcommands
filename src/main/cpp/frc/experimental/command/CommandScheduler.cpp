@@ -35,9 +35,8 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   if (m_disabled || (RobotState::IsDisabled() && !command->RunsWhenDisabled()) || ContainsKey(m_scheduledCommands, command)) {
     return;
   }
-
-  wpi::SmallVector<Subsystem*, 8> requirements;
-  command->GetRequirements(requirements);
+  
+  const auto& requirements = command->GetRequirements();
 
   wpi::SmallVector<Command*, 8> intersection;
 
@@ -120,8 +119,7 @@ void CommandScheduler::Cancel(Command* command) {
     action(*command);
   }
   m_scheduledCommands.erase(find);
-  wpi::SmallVector<Subsystem*, 8> requirements;
-  command->GetRequirements(requirements);
+  const auto& requirements = command->GetRequirements();
   for (auto requirement : requirements) {
     m_requirements.erase(requirement);
   }

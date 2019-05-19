@@ -9,8 +9,12 @@ namespace experimental {
 class SendableCommandBase : public Sendable, public Command {
  public:
   void AddRequirements(std::initializer_list<Subsystem*> requirements);
+  template<typename T>
+  void AddRequirements(T begin, T end) {
+    m_requirements.insert(begin, end);
+  }
 
-  void GetRequirements(wpi::SmallVectorImpl<Subsystem*>& requirements) const override;
+  const std::set<Subsystem*>& GetRequirements() const override;
 
   void SetName(const wpi::Twine& name) override {
     m_name = name.str();
@@ -35,7 +39,7 @@ class SendableCommandBase : public Sendable, public Command {
   SendableCommandBase();
   std::string m_name;
   std::string m_subsystem;
-  wpi::SmallVector<Subsystem*, 4> m_requirements;
+  std::set<Subsystem*> m_requirements;
 };
 }
 }

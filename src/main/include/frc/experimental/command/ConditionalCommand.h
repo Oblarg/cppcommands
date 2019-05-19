@@ -1,0 +1,56 @@
+#pragma once
+
+#include "SendableCommandBase.h"
+#include "CommandGroupBase.h"
+
+namespace frc {
+namespace experimental {
+class ConditionalCommand : public SendableCommandBase {
+ public:
+  ConditionalCommand(Command* onTrue, Command* onFalse, std::function<bool()> condition)
+    : m_onTrue{onTrue}, m_onFalse{onFalse}, m_condition{std::move(condition)} {
+      CommandGroupBase::RequireUngrouped({onTrue, onFalse});
+      CommandGroupBase::RegisterGroupedCommands({onTrue, onFalse});
+      
+      auto& onTrueRequirements = onTrue->GetRequirements();
+      AddRequirements(onTrueRequirements.begin(), onTrueRequirements.end());
+      auto& onFalseRequirements = onFalse->GetRequirements();
+      AddRequirements(onFalseRequirements.begin(), onFalseRequirements.end());
+    }
+    
+    void Initialize() override {
+      if (m_condition()) {
+        m_selectedCommand = m_onTrue;
+      } else {
+        m_selectedCommand = m_onFalse;
+      }
+      m_selectedCommand->Initialize();
+    }
+    
+    void Execute() override {
+      m_selectedCommand->Execute();
+    }
+    
+    void End(bool interrupted) override {
+      m_selectedCommand->End(interrupted);
+    }
+    
+    bool IsFinished() override {
+      return m_selectedCommand->IsFinished();
+    }
+    
+    const std::set<Subsystem*>& GetRequirements() const override {
+      return m_requirements;
+    }
+    
+    bool RunsWhenDisabled() override {
+      return m_selectedCommand->RunsWhenDisabled();
+    }
+ private:
+  Command* m_onTrue;
+  Command* m_onFalse;
+  std::function<bool()> m_condition;
+  Command* m_selectedCommand{nullptr};
+};
+}
+}

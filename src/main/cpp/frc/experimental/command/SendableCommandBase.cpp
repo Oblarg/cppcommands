@@ -10,11 +10,11 @@ SendableCommandBase::SendableCommandBase() {
 
 
   void SendableCommandBase::AddRequirements(std::initializer_list<Subsystem*> requirements) {
-    m_requirements.append(requirements);
+    m_requirements.insert(requirements);
   }
 
-  void SendableCommandBase::GetRequirements(wpi::SmallVectorImpl<Subsystem*>& requirements) const {
-    requirements.append(m_requirements.begin(), m_requirements.end());
+  const std::set<Subsystem*>& SendableCommandBase::GetRequirements() const {
+    return m_requirements;
   }
 
   void SendableCommandBase::InitSendable(frc::SendableBuilder& builder) {
