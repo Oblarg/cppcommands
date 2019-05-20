@@ -22,15 +22,15 @@ class Command {
   virtual void End(bool interrupted);
   virtual bool IsFinished() { return false; }
   virtual const std::set<Subsystem*>& GetRequirements() const = 0;
-  Command* WithTimeout(double seconds) const;
-  Command* InterruptOn(std::function<bool()> condition) const;
-  Command* WhenFinished(std::function<void()> toRun) const;
-  Command* BeforeStarting(std::function<void()> toRun) const;
-  Command* AndThen(std::initializer_list<Command*> next) const;
-  Command* DeadlineWith(std::initializer_list<Command*> parallel) const;
-  Command* AlongWith(std::initializer_list<Command*> parallel) const;
-  Command* RaceWith(std::initializer_list<Command*> parallel) const;
-  Command* Perpetually() const;
+  Command* WithTimeout(double seconds);
+  Command* InterruptOn(std::function<bool()> condition);
+  Command* WhenFinished(std::function<void()> toRun);
+  Command* BeforeStarting(std::function<void()> toRun);
+  Command* AndThen(std::initializer_list<Command*> next);
+  Command* DeadlineWith(std::initializer_list<Command*> parallel);
+  Command* AlongWith(std::initializer_list<Command*> parallel);
+  Command* RaceWith(std::initializer_list<Command*> parallel);
+  Command* Perpetually();
   void Schedule(bool interruptible);
   void Schedule() { Schedule(true); }
   void Cancel();

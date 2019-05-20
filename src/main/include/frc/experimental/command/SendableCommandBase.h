@@ -9,6 +9,7 @@ namespace experimental {
 class SendableCommandBase : public Sendable, public Command {
  public:
   void AddRequirements(std::initializer_list<Subsystem*> requirements);
+  void AddRequirements(const std::set<Subsystem*>& requirements);
   template<typename T>
   void AddRequirements(T begin, T end) {
     m_requirements.insert(begin, end);

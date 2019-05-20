@@ -2,6 +2,12 @@
 #include "frc/experimental/command/InstantCommand.h"
 #include "frc/experimental/command/CommandScheduler.h"
 
+#include "frc/experimental/command/PerpetualCommand.h"
+#include "frc/experimental/command/WaitCommand.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
+#include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/ParallelDeadlineGroup.h"
+
 #ifdef __GNUG__
 #include <cstdlib>
 #include <memory>
@@ -40,47 +46,47 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-// Command* Command::WithTimeout(double seconds) const {
-//   return new ParallelRaceGroup(this, new WaitCommand(seconds));
-// }
+Command* Command::WithTimeout(double seconds) {
+  return new ParallelRaceGroup({this, new WaitCommand(seconds)});
+}
 
-// Command* Command::InterruptOn(std::function<bool()> condition) const {
-//   return new ParallelRaceGroup(this, new WaitUntilCommand(std::move(condition)));
-// }
+Command* Command::InterruptOn(std::function<bool()> condition) {
+  return new ParallelRaceGroup({this, new WaitUntilCommand(std::move(condition))});
+}
 
-// Command* Command::WhenFinished(std::function<void()> toRun) const {
-//   return new SequentialCommandGroup(this, new InstantCommand(std::move(toRun), {}));
-// }
+Command* Command::WhenFinished(std::function<void()> toRun) {
+  return new SequentialCommandGroup({this, new InstantCommand(std::move(toRun), {})});
+}
 
-// Command* Command::BeforeStarting(std::function<void()> toRun) const {
-//   return new SequentialCommandGroup(new InstantCommand(std::move(toRun), {}), this);
-// }
+Command* Command::BeforeStarting(std::function<void()> toRun) {
+  return new SequentialCommandGroup({new InstantCommand(std::move(toRun), {}), this});
+}
 
-// Command* Command::AndThen(std::initializer_list<Command*> next) const {
-//   auto group = new SequentialCommandGroup(this);
-//   group->AddCommands(next);
-//   return group;
-// }
+Command* Command::AndThen(std::initializer_list<Command*> next) {
+  auto group = new SequentialCommandGroup({this});
+  group->AddCommands({next});
+  return group;
+}
 
-// Command* Command::DeadlineWith(std::initializer_list<Command*> parallel) const {
-//   return new ParallelDeadlineGroup(this, parallel);
-// }
+Command* Command::DeadlineWith(std::initializer_list<Command*> parallel) {
+  return new ParallelDeadlineGroup({this, parallel});
+}
 
-// Command* Command::AlongWith(std::initializer_list<Command*> parallel) const {
-//   auto group = new ParallelCommandGroup(this);
-//   group->AddCommands(parallel);
-//   return group;
-// }
+Command* Command::AlongWith(std::initializer_list<Command*> parallel) {
+  auto group = new ParallelCommandGroup({this});
+  group->AddCommands({parallel});
+  return group;
+}
 
-// Command* Command::RaceWith(std::initializer_list<Command*> parallel) const {
-//   auto group = new ParallelRaceGroup(this);
-//   group->AddCommands(parallel);
-//   return group;
-// }
+Command* Command::RaceWith(std::initializer_list<Command*> parallel) {
+  auto group = new ParallelRaceGroup({this});
+  group->AddCommands({parallel});
+  return group;
+}
 
-// Command* Command::Perpetually() const {
-//   return new PerpetualCommand(this);
-// }
+Command* Command::Perpetually()  {
+  return new PerpetualCommand({this});
+}
 
 void Command::Schedule(bool interruptible) {
   CommandScheduler::GetInstance().Schedule(interruptible, this);
