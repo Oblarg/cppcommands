@@ -26,13 +26,13 @@ class CommandScheduler final : public SendableBase {
   }
 
   void Schedule(bool interruptible, Command* command);
-  void Schedule(bool interruptible, std::initializer_list<Command*> commands) {
+  void Schedule(bool interruptible, wpi::ArrayRef<Command*> commands) {
     for (auto command : commands) {
       Schedule(interruptible, command);
     }
   }
 
-    void Schedule(std::initializer_list<Command*> commands) {
+    void Schedule(wpi::ArrayRef<Command*> commands) {
     for (auto command : commands) {
       Schedule(true, command);
     }
@@ -44,16 +44,16 @@ class CommandScheduler final : public SendableBase {
 
   void UnregisterSubsystem(Subsystem* subsystem);
 
-  void RegisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
-  void UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems);
+  void UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems);
 
   void SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand);
 
   Command* GetDefaultCommand(const Subsystem* subsystem) const;
 
   void Cancel(Command* command);
-  void Cancel(std::initializer_list<Command*> commands) {
+  void Cancel(wpi::ArrayRef<Command*> commands) {
     for (auto command : commands) {
       Cancel(command);
     }
@@ -61,7 +61,7 @@ class CommandScheduler final : public SendableBase {
   void CancelAll();
 
   double TimeSinceScheduled(const Command* command) const;
-  bool IsScheduled(std::initializer_list<const Command*> commands) const;
+  bool IsScheduled(wpi::ArrayRef<const Command*> commands) const;
   bool IsScheduled(const Command* command) const;
 
   Command* Requiring(const Subsystem* subsystem) const;

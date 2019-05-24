@@ -7,11 +7,11 @@ namespace frc {
 namespace experimental {
 class ParallelRaceGroup : public CommandGroupBase {
  public:
-  ParallelRaceGroup(std::initializer_list<Command*> commands) {
+  ParallelRaceGroup(wpi::ArrayRef<Command*> commands) {
     AddCommands(commands);
   }
   
-  void AddCommands(std::initializer_list<Command*> commands) override {
+  void AddCommands(wpi::ArrayRef<Command*> commands) override {
     RequireUngrouped(commands);
     
     // TODO: Running Group
@@ -21,8 +21,7 @@ class ParallelRaceGroup : public CommandGroupBase {
     // TODO: Disjoint
     for(auto command : commands) {
       m_commands.emplace(command);
-      auto& requirements = command->GetRequirements();
-      AddRequirements(requirements.begin(), requirements.end());
+      AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
     }
   }

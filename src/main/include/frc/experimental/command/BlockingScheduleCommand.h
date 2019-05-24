@@ -1,13 +1,15 @@
 #pragma once
 
 #include "SendableCommandBase.h"
-#include <set>
+#include <wpi/SmallVector.h>
+#include "SetUtilities.h"
 
 namespace frc {
 namespace experimental {
 class BlockingScheduleCommand : public SendableCommandBase {
  public:
-  BlockingScheduleCommand(std::initializer_list<Command*> toSchedule) : m_toSchedule{toSchedule} {
+  BlockingScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
+    SetInsert(m_toSchedule, toSchedule);
   }
 
   void Initialize() override {
@@ -35,7 +37,7 @@ class BlockingScheduleCommand : public SendableCommandBase {
     return m_finished;
   }
  private:
-  std::set<Command*> m_toSchedule;
+  wpi::SmallVector<Command*,4> m_toSchedule;
   bool m_finished{false};
 };
 }

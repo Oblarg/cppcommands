@@ -4,7 +4,7 @@ namespace frc {
 namespace experimental {
 class InstantCommand : public SendableCommandBase {
  public:
-  InstantCommand(std::function<void()> toRun, std::initializer_list<Subsystem*> requirements) : m_toRun{std::move(toRun)} {
+  InstantCommand(std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) : m_toRun{std::move(toRun)} {
     AddRequirements(requirements);
   }
 

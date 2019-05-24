@@ -2,20 +2,16 @@
 
 #include <frc/smartdashboard/Sendable.h>
 #include "Command.h"
-#include <set>
+#include <wpi/SmallVector.h>
+#include <wpi/SmallPtrSet.h>
 
 namespace frc {
 namespace experimental {
 class SendableCommandBase : public Sendable, public Command {
  public:
-  void AddRequirements(std::initializer_list<Subsystem*> requirements);
-  void AddRequirements(const std::set<Subsystem*>& requirements);
-  template<typename T>
-  void AddRequirements(T begin, T end) {
-    m_requirements.insert(begin, end);
-  }
+  void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
 
-  const std::set<Subsystem*>& GetRequirements() const override;
+  wpi::ArrayRef<Subsystem*> GetRequirements() const override;
 
   void SetName(const wpi::Twine& name) override {
     m_name = name.str();
@@ -40,7 +36,7 @@ class SendableCommandBase : public Sendable, public Command {
   SendableCommandBase();
   std::string m_name;
   std::string m_subsystem;
-  std::set<Subsystem*> m_requirements;
+  wpi::SmallVector<Subsystem*, 4> m_requirements;
 };
 }
 }

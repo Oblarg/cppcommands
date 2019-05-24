@@ -9,8 +9,8 @@ namespace frc {
 namespace experimental {
 class SelectCommand : public SendableCommandBase {
  public:
-  SelectCommand(std::initializer_list<std::pair<void* const, Command*>> commands, std::function<void*()> selector) 
-    : m_commands{commands}, m_selector{std::move(selector)} {
+  SelectCommand(wpi::ArrayRef<std::pair<void* const, Command*>> commands, std::function<void*()> selector) 
+    : m_commands{commands.begin(), commands.end()}, m_selector{std::move(selector)} {
     for (auto& command : commands) {
       AddRequirements(command.second->GetRequirements());
     }

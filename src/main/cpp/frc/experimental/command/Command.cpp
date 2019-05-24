@@ -7,6 +7,8 @@
 #include "frc/experimental/command/ParallelCommandGroup.h"
 #include "frc/experimental/command/ParallelRaceGroup.h"
 #include "frc/experimental/command/ParallelDeadlineGroup.h"
+#include "frc/experimental/command/SequentialCommandGroup.h"
+#include "frc/experimental/command/WaitUntilCommand.h"
 
 #ifdef __GNUG__
 #include <cstdlib>
@@ -62,30 +64,30 @@ Command* Command::BeforeStarting(std::function<void()> toRun) {
   return new SequentialCommandGroup({new InstantCommand(std::move(toRun), {}), this});
 }
 
-Command* Command::AndThen(std::initializer_list<Command*> next) {
-  auto group = new SequentialCommandGroup({this});
+Command* Command::AndThen(wpi::ArrayRef<Command*> next) {
+  auto group = new SequentialCommandGroup(this);
   group->AddCommands({next});
   return group;
 }
 
-Command* Command::DeadlineWith(std::initializer_list<Command*> parallel) {
+Command* Command::DeadlineWith(wpi::ArrayRef<Command*> parallel) {
   return new ParallelDeadlineGroup({this, parallel});
 }
 
-Command* Command::AlongWith(std::initializer_list<Command*> parallel) {
-  auto group = new ParallelCommandGroup({this});
+Command* Command::AlongWith(wpi::ArrayRef<Command*> parallel) {
+  auto group = new ParallelCommandGroup(this);
   group->AddCommands({parallel});
   return group;
 }
 
-Command* Command::RaceWith(std::initializer_list<Command*> parallel) {
-  auto group = new ParallelRaceGroup({this});
+Command* Command::RaceWith(wpi::ArrayRef<Command*> parallel) {
+  auto group = new ParallelRaceGroup(this);
   group->AddCommands({parallel});
   return group;
 }
 
 Command* Command::Perpetually()  {
-  return new PerpetualCommand({this});
+  return new PerpetualCommand(this);
 }
 
 void Command::Schedule(bool interruptible) {

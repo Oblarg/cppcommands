@@ -9,8 +9,8 @@ class PerpetualCommand : public SendableCommandBase {
  public:
   explicit PerpetualCommand(Command* command) 
     : m_command{command} {
-      CommandGroupBase::RequireUngrouped({command});
-      CommandGroupBase::RegisterGroupedCommands({command});
+      CommandGroupBase::RequireUngrouped(command);
+      CommandGroupBase::RegisterGroupedCommands(command);
       AddRequirements(command->GetRequirements());
     }
     

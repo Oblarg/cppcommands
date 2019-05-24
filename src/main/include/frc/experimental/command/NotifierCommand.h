@@ -7,7 +7,7 @@ namespace frc {
 namespace experimental {
 class NotifierCommand : public SendableCommandBase {
  public:
-  NotifierCommand(std::function<void()> toRun, double period, std::initializer_list<Subsystem*> requirements) :
+  NotifierCommand(std::function<void()> toRun, double period, wpi::ArrayRef<Subsystem*> requirements) :
     m_notifier{std::move(toRun)}, m_period{period} {
       AddRequirements(requirements);
   }

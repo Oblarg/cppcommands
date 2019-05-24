@@ -1,5 +1,6 @@
 #include <frc/experimental/command/SendableCommandBase.h>
 #include <frc/smartdashboard/SendableBuilder.h>
+#include <frc/experimental/command/SetUtilities.h>
 
 using namespace frc::experimental;
 
@@ -9,12 +10,12 @@ SendableCommandBase::SendableCommandBase() {
 }
 
 
-  void SendableCommandBase::AddRequirements(std::initializer_list<Subsystem*> requirements) {
-    m_requirements.insert(requirements);
+  void SendableCommandBase::AddRequirements(wpi::ArrayRef<Subsystem*> requirements) {
+    SetInsert(m_requirements, requirements);
   }
 
-  const std::set<Subsystem*>& SendableCommandBase::GetRequirements() const {
-    return m_requirements;
+  wpi::ArrayRef<Subsystem*> SendableCommandBase::GetRequirements() const {
+    return wpi::ArrayRef<Subsystem*>{m_requirements.begin(), m_requirements.end()};
   }
 
   void SendableCommandBase::InitSendable(frc::SendableBuilder& builder) {

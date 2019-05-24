@@ -8,11 +8,11 @@ class SusbsystemBase : public Subsystem {
  public:
   SusbsystemBase();
 
-  virtual void SetDefaultCommand(Command* command) override {
+  void SetDefaultCommand(Command* command) override {
     m_defaultCommand = command;
   }
 
-  virtual Command* GetDefaultCommand() const override {
+  Command* GetDefaultCommand() const override {
     return m_defaultCommand;
   }
  private:

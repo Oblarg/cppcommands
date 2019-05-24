@@ -7,7 +7,7 @@ namespace frc {
 namespace experimental {
 class ParallelDeadlineGroup : public CommandGroupBase {
  public:
-  ParallelDeadlineGroup(Command* deadline, std::initializer_list<Command*> commands) 
+  ParallelDeadlineGroup(Command* deadline, wpi::ArrayRef<Command*> commands) 
       : m_deadline{deadline} {
     AddCommands(commands);
     if (m_commands.find(deadline) == m_commands.end()) {
@@ -22,7 +22,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     m_deadline = deadline;
   }
   
-  void AddCommands(std::initializer_list<Command*> commands) override {
+  void AddCommands(wpi::ArrayRef<Command*> commands) override {
     RequireUngrouped(commands);
     
     // TODO: Running Group
@@ -32,8 +32,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     // TODO: Disjoint
     for(auto command : commands) {
       m_commands[command] = false;
-      auto& requirements = command->GetRequirements();
-      AddRequirements(requirements.begin(), requirements.end());
+      AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
     }
   }

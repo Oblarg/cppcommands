@@ -87,13 +87,13 @@ void CommandScheduler::UnregisterSubsystem(Subsystem* subsystem) {
   }
 }
 
-void CommandScheduler::RegisterSubsystem(std::initializer_list<Subsystem*> subsystems) {
+void CommandScheduler::RegisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
   for (auto* subsystem : subsystems) {
       RegisterSubsystem(subsystem);
     }
 }
 
-void CommandScheduler::UnregisterSubsystem(std::initializer_list<Subsystem*> subsystems) {
+void CommandScheduler::UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems) {
     for (auto* subsystem : subsystems) {
       UnregisterSubsystem(subsystem);
     }
@@ -139,7 +139,7 @@ void CommandScheduler::CancelAll() {
       return -1;
     }
   }
-  bool CommandScheduler::IsScheduled(std::initializer_list<const Command*> commands) const {
+  bool CommandScheduler::IsScheduled(wpi::ArrayRef<const Command*> commands) const {
     for (auto command : commands) {
       if (!IsScheduled(command)) {
         return false;

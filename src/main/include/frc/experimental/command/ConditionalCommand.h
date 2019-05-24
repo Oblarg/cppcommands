@@ -12,10 +12,8 @@ class ConditionalCommand : public SendableCommandBase {
       CommandGroupBase::RequireUngrouped({onTrue, onFalse});
       CommandGroupBase::RegisterGroupedCommands({onTrue, onFalse});
       
-      auto& onTrueRequirements = onTrue->GetRequirements();
-      AddRequirements(onTrueRequirements.begin(), onTrueRequirements.end());
-      auto& onFalseRequirements = onFalse->GetRequirements();
-      AddRequirements(onFalseRequirements.begin(), onFalseRequirements.end());
+      AddRequirements(onTrue->GetRequirements());
+      AddRequirements(onFalse->GetRequirements());
     }
     
     void Initialize() override {
@@ -37,10 +35,6 @@ class ConditionalCommand : public SendableCommandBase {
     
     bool IsFinished() override {
       return m_selectedCommand->IsFinished();
-    }
-    
-    const std::set<Subsystem*>& GetRequirements() const override {
-      return m_requirements;
     }
     
     bool RunsWhenDisabled() override {

@@ -13,6 +13,23 @@ class WaitCommand : public SendableCommandBase {
       auto secondsStr = std::to_string(seconds);
       SetName(wpi::Twine(m_name) + ": " + wpi::Twine(secondsStr) + " seconds");
     }
+    
+    void Initialize() override {
+      m_timer.Reset();
+      m_timer.Start();
+    }
+    
+    void End(bool interrupted) override {
+      m_timer.Stop();
+    }
+    
+    bool IsFinished() override {
+      return m_timer.HasPeriodPassed(m_duration);
+    }
+    
+    bool RunsWhenDisabled() override {
+      return true;
+    }
  protected:
   frc::Timer m_timer;
  private:
