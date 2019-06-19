@@ -52,8 +52,6 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
     }
   }
 
-
-
   if (isDisjoint || allInterruptible) {
     if (allInterruptible) {
       for (auto cmdToCancel : intersection) {

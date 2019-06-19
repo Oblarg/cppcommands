@@ -6,9 +6,9 @@
 
 namespace frc {
 namespace experimental {
-class BlockingScheduleCommand : public SendableCommandBase {
+class ProxyScheduleCommand : public SendableCommandBase {
  public:
-  BlockingScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
+  ProxyScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
     SetInsert(m_toSchedule, toSchedule);
   }
 

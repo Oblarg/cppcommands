@@ -40,7 +40,7 @@ class CommandScheduler final : public SendableBase {
 
   void Run();
 
-    void RegisterSubsystem(Subsystem* subsystem);
+  void RegisterSubsystem(Subsystem* subsystem);
 
   void UnregisterSubsystem(Subsystem* subsystem);
 
@@ -103,6 +103,7 @@ class CommandScheduler final : public SendableBase {
   wpi::SmallVector<Action, 4> m_interruptActions;
   wpi::SmallVector<Action, 4> m_finishActions;
 
+  friend class CommandTestBase;
 };
 }
 }
