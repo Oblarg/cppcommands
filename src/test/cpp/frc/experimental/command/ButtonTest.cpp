@@ -12,13 +12,19 @@ class ButtonTest : public CommandTestBase {
 TEST_F(ButtonTest, WhenPressedTest) {
   auto& scheduler = CommandScheduler::GetInstance();
   MockCommandHolder command1Holder{true, {}};
-  Command* command1 = command1Holder.GetMock();
+  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
   
   InternalButton button;
+
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(2);
+
   button.SetPressed(false);
   auto whenPressed = button.WhenPressed(command1);
   scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(command1));
   button.SetPressed(true);
   scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(command1));
   scheduler.Run();
 }
