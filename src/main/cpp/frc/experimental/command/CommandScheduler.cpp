@@ -54,7 +54,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
 
   if (isDisjoint || allInterruptible) {
     if (allInterruptible) {
-      for (auto cmdToCancel : intersection) {
+      for (auto&& cmdToCancel : intersection) {
         Cancel(cmdToCancel);
       }
     }
@@ -64,7 +64,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
     for (auto&& action : m_initActions) {
       action(*command);
     }
-    for (auto requirement : requirements) {
+    for (auto&& requirement : requirements) {
       m_requirements[requirement] = command;
     }
   }
@@ -76,12 +76,12 @@ void CommandScheduler::Run() {
   }
 
   //Run the periodic method of all registered subsystems.
-  for(auto subsystem : m_subsystems) {
+  for(auto&& subsystem : m_subsystems) {
     subsystem.getFirst()->Periodic();
   }
 
   //Poll buttons for new commands to add.
-  for (auto button : m_buttons) {
+  for (auto&& button : m_buttons) {
     button();
   }
 
@@ -105,7 +105,7 @@ void CommandScheduler::Run() {
         action(*command);
       }
 
-      for (auto requirement : command->GetRequirements()) {
+      for (auto&& requirement : command->GetRequirements()) {
         auto r = m_requirements.find(requirement);
         if (r != m_requirements.end()) {
           m_requirements.erase(r);
@@ -116,7 +116,7 @@ void CommandScheduler::Run() {
     }
 
     //Add default commands for un-required registered subsystems.
-    for (auto subsystem : m_subsystems) {
+    for (auto&& subsystem : m_subsystems) {
       auto s = m_requirements.find(subsystem.getFirst());
       if (s != m_requirements.end() && s->getFirst()->GetCurrentCommand() != NULL) {
         Schedule(s->getFirst()->GetDefaultCommand());

@@ -25,6 +25,6 @@ TEST_F(ButtonTest, WhenPressedTest) {
   EXPECT_FALSE(scheduler.IsScheduled(command1));
   button.SetPressed(true);
   scheduler.Run();
-  EXPECT_TRUE(scheduler.IsScheduled(command1));
   scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(command1));
 }
