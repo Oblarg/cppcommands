@@ -71,7 +71,59 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
 }
 
 void CommandScheduler::Run() {
+  if(m_disabled) {
+    return;
+  }
 
+  //Run the periodic method of all registered subsystems.
+  for(auto subsystem : m_subsystems) {
+    subsystem.getFirst()->Periodic();
+  }
+
+  //Poll buttons for new commands to add.
+  for (auto button : m_buttons) {
+    button();
+  }
+
+  //Run scheduled commands, remove finished commands.
+  for (auto iterator = m_scheduledCommands.begin(); iterator != m_scheduledCommands.end(); iterator++) {
+    Command* command = iterator->getFirst();
+
+    if (!command->RunsWhenDisabled() && RobotState::IsDisabled()) {
+      Cancel(command);
+      continue;
+    }
+
+    command->Execute();
+    for (auto&& action : m_executeActions) {
+      action(*command);
+    }
+
+    if (command->IsFinished()) {
+      command->End(true);
+      for (auto&& action : m_finishActions) {
+        action(*command);
+      }
+
+      for (auto requirement : command->GetRequirements()) {
+        auto r = m_requirements.find(requirement);
+        if (r != m_requirements.end()) {
+          m_requirements.erase(r);
+        }
+      }
+
+      m_scheduledCommands.erase(iterator);
+    }
+
+    //Add default commands for un-required registered subsystems.
+    for (auto subsystem : m_subsystems) {
+      auto s = m_requirements.find(subsystem.getFirst());
+      if (s != m_requirements.end() && s->getFirst()->GetCurrentCommand() != NULL) {
+        Schedule(s->getFirst()->GetDefaultCommand());
+      }
+    }
+
+  }
 }
 
 void CommandScheduler::RegisterSubsystem(Subsystem* subsystem) {

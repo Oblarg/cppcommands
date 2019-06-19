@@ -20,7 +20,7 @@ TEST_F(CommandScheduleTest, InstantScheduleTest) {
   EXPECT_CALL(*command, End(true));
 
   scheduler.Schedule(command);
-  scheduler.Run();
-  
   EXPECT_TRUE(scheduler.IsScheduled(command));
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(command));
 }
