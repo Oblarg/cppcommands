@@ -79,6 +79,13 @@
     "xstring": "cpp",
     "xtree": "cpp",
     "unordered_set": "cpp",
-    "*.inc": "cpp"
+    "*.inc": "cpp",
+    "complex": "cpp",
+    "iomanip": "cpp",
+    "queue": "cpp",
+    "stack": "cpp",
+    "xthread": "cpp",
+    "xlocmon": "cpp",
+    "xloctime": "cpp"
   }
 }

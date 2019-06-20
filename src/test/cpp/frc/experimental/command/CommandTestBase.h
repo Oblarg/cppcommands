@@ -4,6 +4,7 @@
 #include "gmock/gmock.h"
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/command/CommandGroupBase.h"
+#include "frc/experimental/command/InstantCommand.h"
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SetUtilities.h"
@@ -60,6 +61,16 @@ class CommandTestBase : public ::testing::Test {
     std::vector<Subsystem*> m_requirements;
     MockCommand m_mockCommand;
   };
+
+  class DisabledInstantCommand : public InstantCommand {
+   public:
+    DisabledInstantCommand(std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) : InstantCommand(toRun, requirements) {}
+    
+    bool RunsWhenDisabled() override {
+      return true;
+    }
+  };
+
  protected:
    CommandScheduler GetScheduler() {
     return CommandScheduler();

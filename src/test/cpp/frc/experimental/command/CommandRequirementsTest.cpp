@@ -76,19 +76,15 @@ TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
   TestSubsystem* requirement3 = new TestSubsystem();
   TestSubsystem* requirement4 = new TestSubsystem();
 
-  MockCommandHolder command1Holder{true, {requirement1, requirement2}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
-  MockCommandHolder command2Holder{true, {requirement3}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
-  MockCommandHolder command3Holder{true, {requirement3, requirement4}};
-  MockCommandHolder::MockCommand* command3 = command2Holder.GetMock();
+  Command* command1 = new DisabledInstantCommand([]{},{requirement1, requirement2});
+  Command* command2 = new DisabledInstantCommand([]{},{requirement3});
+  Command* command3 = new DisabledInstantCommand([]{},{requirement3, requirement4});
 
   Command* group = new ParallelCommandGroup({command1, command2});
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
-  scheduler.Schedule(command1);
 
-  EXPECT_TRUE(scheduler.IsScheduled({command1, command3}));
+  EXPECT_TRUE(scheduler.IsScheduled({command3}));
   EXPECT_FALSE(scheduler.IsScheduled(group));
 }
