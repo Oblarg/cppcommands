@@ -2,6 +2,7 @@
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/buttons/InternalButton.h"
 #include "CommandTestBase.h"
+#include "frc/experimental/command/InstantCommand.h"
 #include "frc/experimental/command/ParallelCommandGroup.h"
 
 using namespace frc::experimental;
@@ -76,9 +77,9 @@ TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
   TestSubsystem* requirement3 = new TestSubsystem();
   TestSubsystem* requirement4 = new TestSubsystem();
 
-  Command* command1 = new DisabledInstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new DisabledInstantCommand([]{},{requirement3});
-  Command* command3 = new DisabledInstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
+  Command* command2 = new InstantCommand([]{},{requirement3});
+  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
 
   Command* group = new ParallelCommandGroup({command1, command2});
 

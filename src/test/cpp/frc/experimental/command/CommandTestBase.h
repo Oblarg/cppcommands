@@ -4,7 +4,7 @@
 #include "gmock/gmock.h"
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/command/CommandGroupBase.h"
-#include "frc/experimental/command/InstantCommand.h"
+#include "simulation/DriverStationSim.h"
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SetUtilities.h"
@@ -62,18 +62,16 @@ class CommandTestBase : public ::testing::Test {
     MockCommand m_mockCommand;
   };
 
-  class DisabledInstantCommand : public InstantCommand {
-   public:
-    DisabledInstantCommand(std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) : InstantCommand(toRun, requirements) {}
-    
-    bool RunsWhenDisabled() override {
-      return true;
-    }
-  };
-
  protected:
    CommandScheduler GetScheduler() {
     return CommandScheduler();
+   }
+
+   virtual void SetUp() {
+     HALSIM_SetDriverStationEnabled(true);
+     while (!HALSIM_GetDriverStationEnabled()) {
+       std::this_thread::sleep_for(std::chrono::milliseconds(1));
+     }
    }
 };
 }
