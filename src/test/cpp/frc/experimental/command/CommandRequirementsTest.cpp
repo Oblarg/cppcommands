@@ -2,6 +2,7 @@
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/buttons/InternalButton.h"
 #include "CommandTestBase.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
 
 using namespace frc::experimental;
 
@@ -65,4 +66,29 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
   EXPECT_TRUE(scheduler.IsScheduled(command1));
   EXPECT_FALSE(scheduler.IsScheduled(command2));
   scheduler.Run();
+}
+
+TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  TestSubsystem* requirement1 = new TestSubsystem();
+  TestSubsystem* requirement2 = new TestSubsystem();
+  TestSubsystem* requirement3 = new TestSubsystem();
+  TestSubsystem* requirement4 = new TestSubsystem();
+
+  MockCommandHolder command1Holder{true, {requirement1, requirement2}};
+  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  MockCommandHolder command2Holder{true, {requirement3}};
+  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  MockCommandHolder command3Holder{true, {requirement3, requirement4}};
+  MockCommandHolder::MockCommand* command3 = command2Holder.GetMock();
+
+  Command* group = new ParallelCommandGroup({command1, command2});
+
+  scheduler.Schedule(group);
+  scheduler.Schedule(command3);
+  scheduler.Schedule(command1);
+
+  EXPECT_TRUE(scheduler.IsScheduled({command1, command3}));
+  EXPECT_FALSE(scheduler.IsScheduled(group));
 }
