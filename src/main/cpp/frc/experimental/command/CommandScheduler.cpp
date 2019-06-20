@@ -100,7 +100,7 @@ void CommandScheduler::Run() {
     }
 
     if (command->IsFinished()) {
-      command->End(true);
+      command->End(false);
       for (auto&& action : m_finishActions) {
         action(*command);
       }
