@@ -106,10 +106,7 @@ void CommandScheduler::Run() {
       }
 
       for (auto&& requirement : command->GetRequirements()) {
-        auto r = m_requirements.find(requirement);
-        if (r != m_requirements.end()) {
-          m_requirements.erase(r);
-        }
+        m_requirements.erase(requirement);
       }
 
       m_scheduledCommands.erase(iterator);

@@ -20,7 +20,7 @@ TEST_F(ButtonTest, WhenPressedTest) {
   EXPECT_CALL(*command1, Execute()).Times(2);
 
   button.SetPressed(false);
-  auto whenPressed = button.WhenPressed(command1);
+  button.WhenPressed(command1);
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(command1));
   button.SetPressed(true);

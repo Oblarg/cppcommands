@@ -21,11 +21,11 @@ class CommandRequirementsTest : public CommandTestBase {
 TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement = new TestSubsystem();
+  TestSubsystem requirement;
 
-  MockCommandHolder command1Holder{true, {requirement}};
+  MockCommandHolder command1Holder{true, {&requirement}};
   MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
-  MockCommandHolder command2Holder{true, {requirement}};
+  MockCommandHolder command2Holder{true, {&requirement}};
   MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
 
   EXPECT_CALL(*command1, Initialize());
@@ -50,11 +50,11 @@ TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
 TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement = new TestSubsystem();
+  TestSubsystem requirement;
 
-  MockCommandHolder command1Holder{true, {requirement}};
+  MockCommandHolder command1Holder{true, {&requirement}};
   MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
-  MockCommandHolder command2Holder{true, {requirement}};
+  MockCommandHolder command2Holder{true, {&requirement}};
   MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
 
   EXPECT_CALL(*command1, Initialize());
@@ -79,14 +79,14 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
 TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* group = new ParallelCommandGroup({command1, command2});
 
@@ -100,14 +100,14 @@ TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
 TEST_F(CommandRequirementsTest, SequentialGroupRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* group = new SequentialCommandGroup({command1, command2});
 
@@ -121,14 +121,14 @@ TEST_F(CommandRequirementsTest, SequentialGroupRequirementTest) {
 TEST_F(CommandRequirementsTest, RaceGroupRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* group = new ParallelRaceGroup({command1, command2});
 
@@ -142,14 +142,14 @@ TEST_F(CommandRequirementsTest, RaceGroupRequirementTest) {
 TEST_F(CommandRequirementsTest, ParallelDeadlineRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* group = new ParallelDeadlineGroup({command1, command2});
 
@@ -163,14 +163,14 @@ TEST_F(CommandRequirementsTest, ParallelDeadlineRequirementTest) {
 TEST_F(CommandRequirementsTest, ConditionalCommandRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* conditional = new ConditionalCommand(command1, command2, []{return true;});
 
@@ -184,14 +184,14 @@ TEST_F(CommandRequirementsTest, ConditionalCommandRequirementTest) {
 TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem* requirement1 = new TestSubsystem();
-  TestSubsystem* requirement2 = new TestSubsystem();
-  TestSubsystem* requirement3 = new TestSubsystem();
-  TestSubsystem* requirement4 = new TestSubsystem();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-  Command* command1 = new InstantCommand([]{},{requirement1, requirement2});
-  Command* command2 = new InstantCommand([]{},{requirement3});
-  Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
+  Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
+  Command* command2 = new InstantCommand([]{},{&requirement3});
+  Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
   Command* select = new SelectCommand<int>({{1, command1}, {2, command2}}, []{return 1;});
 

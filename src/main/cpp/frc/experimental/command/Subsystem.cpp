@@ -3,6 +3,10 @@
 
 using namespace frc::experimental;
 
+  Subsystem::~Subsystem() {
+      CommandScheduler::GetInstance().UnregisterSubsystem(this);
+  }
+
   void Subsystem::Periodic() {
 
   }

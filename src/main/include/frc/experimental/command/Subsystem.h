@@ -5,7 +5,7 @@ namespace experimental {
 class Command;
 class Subsystem {
  public:
-  ~Subsystem() = default;
+  ~Subsystem();
   virtual void Periodic();
   virtual void SetDefaultCommand(Command* defaultCommand);
   virtual Command* GetDefaultCommand() const;
