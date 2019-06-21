@@ -1,3 +1,5 @@
+#pragma once
+
 #include "SendableCommandBase.h"
 
 namespace frc {

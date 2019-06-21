@@ -13,7 +13,7 @@ TEST_F(ButtonTest, WhenPressedTest) {
   auto& scheduler = CommandScheduler::GetInstance();
   MockCommandHolder command1Holder{true, {}};
   MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
-  
+
   InternalButton button;
 
   EXPECT_CALL(*command1, Initialize());
