@@ -1,15 +1,18 @@
 #pragma once
 
+#include <initializer_list>
+#include <unordered_map>
+
 #include "SendableCommandBase.h"
 #include "CommandGroupBase.h"
-#include <unordered_map>
 #include "PrintCommand.h"
 
 namespace frc {
 namespace experimental {
+template <typename Key>
 class SelectCommand : public SendableCommandBase {
  public:
-  SelectCommand(wpi::ArrayRef<std::pair<void* const, Command*>> commands, std::function<void*()> selector) 
+  SelectCommand(std::initializer_list<std::pair<Key, Command*>> commands, std::function<Key()> selector) 
     : m_commands{commands.begin(), commands.end()}, m_selector{std::move(selector)} {
     for (auto& command : commands) {
       AddRequirements(command.second->GetRequirements());
@@ -20,19 +23,7 @@ class SelectCommand : public SendableCommandBase {
     : m_toRun{toRun} {
   }
   
-  void Initialize() override {
-    if (m_selector) {
-      auto find = m_commands.find(m_selector());
-      if (find == m_commands.end()) {
-        m_selectedCommand = new PrintCommand("SelectCommand selector value does not correspond to any command!");
-        return;
-      }
-      m_selectedCommand = find->second;
-    } else {
-      m_selectedCommand = m_toRun();
-    }
-    m_selectedCommand->Initialize();
-  }
+  void Initialize() override;
   
   void Execute() override {
     m_selectedCommand->Execute();
@@ -50,10 +41,26 @@ class SelectCommand : public SendableCommandBase {
     return m_selectedCommand->RunsWhenDisabled();
   }
  private:
-  std::unordered_map<void*, Command*> m_commands;
-  std::function<void*()> m_selector;
+  std::unordered_map<Key, Command*> m_commands;
+  std::function<Key()> m_selector;
   std::function<Command*()> m_toRun;
   Command* m_selectedCommand;
 };
+
+template <typename T>
+void SelectCommand<T>::Initialize() {
+  if (m_selector) {
+    auto find = m_commands.find(m_selector());
+    if (find == m_commands.end()) {
+      m_selectedCommand = new PrintCommand("SelectCommand selector value does not correspond to any command!");
+      return;
+    }
+    m_selectedCommand = find->second;
+  } else {
+    m_selectedCommand = m_toRun();
+  }
+  m_selectedCommand->Initialize();
+}
+
 }
 }

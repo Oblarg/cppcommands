@@ -193,10 +193,7 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   Command* command2 = new InstantCommand([]{},{requirement3});
   Command* command3 = new InstantCommand([]{},{requirement3, requirement4});
 
-  int key1 = 1;
-  int key2 = 2;
-
-  Command* select = new SelectCommand({{&key1, command1}, {&key2, command2}}, [&key1]{return &key1;});
+  Command* select = new SelectCommand<int>({{1, command1}, {2, command2}}, []{return 1;});
 
   scheduler.Schedule(select);
   scheduler.Schedule(command3);
