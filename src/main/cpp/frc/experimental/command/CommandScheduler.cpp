@@ -1,4 +1,7 @@
+#pragma once
+
 #include <frc/experimental/command/CommandScheduler.h>
+#include <frc/WPIErrors.h>
 #include <frc/experimental/command/Subsystem.h>
 #include <frc/experimental/command/CommandGroupBase.h>
 #include <frc/commands/Scheduler.h>
@@ -30,7 +33,8 @@ CommandScheduler& CommandScheduler::GetInstance() {
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
   auto& groupedCommands = CommandGroupBase::GetGroupedCommands();
   if (ContainsKey(groupedCommands, command)) {
-    // TODO: Illegal use of command
+    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+        "A command that is part of a command group cannot be independently scheduled");
   }
   if (m_disabled || (RobotState::IsDisabled() && !command->RunsWhenDisabled()) || ContainsKey(m_scheduledCommands, command)) {
     return;
