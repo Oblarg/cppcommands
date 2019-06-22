@@ -5,6 +5,7 @@
 #include <wpi/SmallSet.h>
 #include <networktables/NetworkTableEntry.h>
 #include <frc/RobotState.h>
+#include <frc/ErrorBase.h>
 #include <unordered_map>
 #include "CommandState.h"
 
@@ -12,7 +13,7 @@ namespace frc {
 namespace experimental {
 class Command;
 class Subsystem;
-class CommandScheduler final : public SendableBase {
+class CommandScheduler final : public SendableBase, ErrorBase {
  public:
   static CommandScheduler& GetInstance();
   using Action = std::function<void(const Command&)>;

@@ -6,8 +6,6 @@
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <hal/HAL.h>
 
-#include <iostream>
-
 using namespace frc::experimental;
 
 template<typename TMap, typename TKey>
@@ -33,7 +31,7 @@ CommandScheduler& CommandScheduler::GetInstance() {
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
   auto& groupedCommands = CommandGroupBase::GetGroupedCommands();
   if (ContainsKey(groupedCommands, command)) {
-    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+    wpi_setWPIErrorWithContext(CommandIllegalUse,
         "A command that is part of a command group cannot be independently scheduled");
     return;
   }
@@ -153,14 +151,12 @@ void CommandScheduler::UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems)
 
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand) {
   if (!defaultCommand->HasRequirement(subsystem)) {
-    std::cout << "One! \n";
-    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+    wpi_setWPIErrorWithContext(CommandIllegalUse,
         "Default commands must require their subsystem!");
-    std::cout << "Two! \n";
     return;
   }
   if (defaultCommand->IsFinished()) {
-    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+    wpi_setWPIErrorWithContext(CommandIllegalUse,
         "Default commands should not end!");
     return;
   }
