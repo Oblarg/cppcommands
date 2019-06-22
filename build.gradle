@@ -46,7 +46,7 @@ def includeDesktopSupport = true
 model {
     components {
         frcUserProgram(NativeExecutableSpec) {
-            targetPlatform wpi.platforms.roborio
+            // targetPlatform wpi.platforms.roborio
             if (includeDesktopSupport) {
                 targetPlatform wpi.platforms.desktop
             }
@@ -65,7 +65,7 @@ model {
             }
 
             // Defining my dependencies. In this case, WPILib (+ friends), and vendor libraries.
-            useLibrary(it, "wpilib")
+            useLibrary(it, "wpilib_static")
             wpi.deps.vendor.cpp(it)
         }
     }
@@ -80,7 +80,7 @@ model {
                 }
             }
 
-            useLibrary(it, "wpilib", "googletest")
+            useLibrary(it, "wpilib_static", "googletest")
             wpi.deps.vendor.cpp(it)
         }
     }

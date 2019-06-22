@@ -210,5 +210,7 @@ TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
   
   //TODO: figure out how to test this without abusing the fact that the
   //error call erroneously crashes in sim/test
-  EXPECT_DEATH(requirement1.SetDefaultCommand(command1);, "");
+  requirement1.SetDefaultCommand(command1);
+
+  EXPECT_TRUE(requirement1.GetDefaultCommand() == NULL);
 }
