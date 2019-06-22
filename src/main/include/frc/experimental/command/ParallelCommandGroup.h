@@ -12,7 +12,9 @@ class ParallelCommandGroup : public CommandGroupBase {
   }
   
   void AddCommands(wpi::ArrayRef<Command*> commands) override {
-    RequireUngrouped(commands);
+    if (!RequireUngrouped(commands)) {
+      return;
+    }
     
     // TODO: Running Group
     

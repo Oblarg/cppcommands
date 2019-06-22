@@ -201,3 +201,15 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   EXPECT_TRUE(scheduler.IsScheduled({command3}));
   EXPECT_FALSE(scheduler.IsScheduled(select));
 }
+
+TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
+  TestSubsystem requirement1;
+
+  MockCommandHolder command1Holder{true, {}};
+  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+
+  requirement1.SetDefaultCommand(command1);
+  
+  //TODO: figure out how to actually test that the error is correctly registered
+  EXPECT_TRUE(requirement1.GetDefaultCommand() == NULL);
+}

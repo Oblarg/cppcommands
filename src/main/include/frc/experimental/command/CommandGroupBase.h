@@ -10,7 +10,7 @@ class CommandGroupBase : public SendableCommandBase {
   static void RegisterGroupedCommands(wpi::ArrayRef<Command*> commands);
   static void ClearGroupedCommands();
   static void ClearGroupedCommand(Command* command);
-  static void RequireUngrouped(wpi::ArrayRef<Command*> commands);
+  static bool RequireUngrouped(wpi::ArrayRef<Command*> commands);
   static std::set<Command*>& GetGroupedCommands();
 
   static CommandGroupBase* Sequence(wpi::ArrayRef<Command*> commands);

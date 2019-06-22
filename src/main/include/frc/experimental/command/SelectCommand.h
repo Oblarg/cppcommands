@@ -13,7 +13,13 @@ template <typename Key>
 class SelectCommand : public SendableCommandBase {
  public:
   SelectCommand(std::initializer_list<std::pair<Key, Command*>> commands, std::function<Key()> selector) 
-    : m_commands{commands.begin(), commands.end()}, m_selector{std::move(selector)} {
+    : m_selector{std::move(selector)} {
+    for (auto& command : commands) {
+      if (!CommandGroupBase::RequireUngrouped({command.second})) {
+        return;
+      }
+    }
+    m_commands = {commands.begin(), commands.end()};
     for (auto& command : commands) {
       AddRequirements(command.second->GetRequirements());
     }

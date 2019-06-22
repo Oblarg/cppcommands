@@ -12,7 +12,9 @@ class SequentialCommandGroup : public CommandGroupBase {
   }
  
   void AddCommands(wpi::ArrayRef<Command*> commands) final {
-    RequireUngrouped(commands);
+    if (!RequireUngrouped(commands)) {
+      return;
+    }
     
     if (m_currentCommandIndex != -1) {
       // Error

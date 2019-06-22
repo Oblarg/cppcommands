@@ -25,7 +25,7 @@ return map.find(keyToCheck) != map.end();
   void CommandGroupBase::ClearGroupedCommand(Command* command) {
       GetGroupedCommands().erase(command);
   }
-  void CommandGroupBase::RequireUngrouped(wpi::ArrayRef<Command*> commands) {
+  bool CommandGroupBase::RequireUngrouped(wpi::ArrayRef<Command*> commands) {
       bool allUngrouped = true;
       for(auto&& command : commands) {
         allUngrouped &= !ContainsKey(GetGroupedCommands(), command);
@@ -34,6 +34,7 @@ return map.find(keyToCheck) != map.end();
         wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
             "Commands cannot be added to more than one CommandGroup");
       }
+      return allUngrouped;
   }
   
   std::set<Command*>& CommandGroupBase::GetGroupedCommands() {

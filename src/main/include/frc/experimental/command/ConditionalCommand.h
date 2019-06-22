@@ -8,9 +8,15 @@ namespace experimental {
 class ConditionalCommand : public SendableCommandBase {
  public:
   ConditionalCommand(Command* onTrue, Command* onFalse, std::function<bool()> condition)
-    : m_onTrue{onTrue}, m_onFalse{onFalse}, m_condition{std::move(condition)} {
-      CommandGroupBase::RequireUngrouped({onTrue, onFalse});
+    : m_condition{std::move(condition)} {
+      if (!CommandGroupBase::RequireUngrouped({onTrue, onFalse})) {
+        return;
+      }
+
       CommandGroupBase::RegisterGroupedCommands({onTrue, onFalse});
+
+      m_onTrue = onTrue;
+      m_onFalse = onFalse;
       
       AddRequirements(onTrue->GetRequirements());
       AddRequirements(onFalse->GetRequirements());

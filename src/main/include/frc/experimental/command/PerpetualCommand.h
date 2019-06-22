@@ -7,9 +7,11 @@ namespace frc {
 namespace experimental {
 class PerpetualCommand : public SendableCommandBase {
  public:
-  explicit PerpetualCommand(Command* command) 
-    : m_command{command} {
-      CommandGroupBase::RequireUngrouped(command);
+  explicit PerpetualCommand(Command* command) {
+      if (!CommandGroupBase::RequireUngrouped(command)) { 
+        return; 
+      }
+      m_command = command;
       CommandGroupBase::RegisterGroupedCommands(command);
       AddRequirements(command->GetRequirements());
     }

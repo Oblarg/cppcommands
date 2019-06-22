@@ -1,5 +1,3 @@
-#pragma once
-
 #include <frc/experimental/command/CommandScheduler.h>
 #include <frc/WPIErrors.h>
 #include <frc/experimental/command/Subsystem.h>
@@ -7,6 +5,8 @@
 #include <frc/commands/Scheduler.h>
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <hal/HAL.h>
+
+#include <iostream>
 
 using namespace frc::experimental;
 
@@ -35,6 +35,7 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   if (ContainsKey(groupedCommands, command)) {
     wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
         "A command that is part of a command group cannot be independently scheduled");
+    return;
   }
   if (m_disabled || (RobotState::IsDisabled() && !command->RunsWhenDisabled()) || ContainsKey(m_scheduledCommands, command)) {
     return;
@@ -151,6 +152,18 @@ void CommandScheduler::UnregisterSubsystem(wpi::ArrayRef<Subsystem*> subsystems)
 }
 
 void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, Command* defaultCommand) {
+  if (!defaultCommand->HasRequirement(subsystem)) {
+    std::cout << "One! \n";
+    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+        "Default commands must require their subsystem!");
+    std::cout << "Two! /n";
+    return;
+  }
+  if (defaultCommand->IsFinished()) {
+    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+        "Default commands should not end!");
+    return;
+  }
   m_subsystems[subsystem] = defaultCommand;
 }
 
@@ -159,7 +172,9 @@ Command* CommandScheduler::GetDefaultCommand(const Subsystem* subsystem) const {
     if (find != m_subsystems.end()) {
       return find->second;
     }
-    return nullptr;
+    else {
+      return nullptr;
+    }
 }
 
 void CommandScheduler::Cancel(Command* command) {
@@ -208,7 +223,9 @@ Command* CommandScheduler::Requiring(const Subsystem* subsystem) const {
   if (find != m_requirements.end()) {
     return find->second;
   }
-  return nullptr;
+  else {
+    return nullptr;
+  }
 }
 
 void CommandScheduler::InitSendable(frc::SendableBuilder& builder) {

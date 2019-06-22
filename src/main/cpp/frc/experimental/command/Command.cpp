@@ -103,7 +103,11 @@ bool Command::IsScheduled() const {
 }
 
 bool Command::HasRequirement(Subsystem* requirement) const {
-  return true;
+  bool hasRequirement = false;
+  for (auto&& subsystem: GetRequirements()) {
+    hasRequirement |= requirement == subsystem;
+  }
+  return hasRequirement;
 }
 
 std::string Command::GetName() const {
