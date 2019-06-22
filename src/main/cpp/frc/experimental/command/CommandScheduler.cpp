@@ -156,7 +156,7 @@ void CommandScheduler::SetDefaultCommand(Subsystem* subsystem, Command* defaultC
     std::cout << "One! \n";
     wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
         "Default commands must require their subsystem!");
-    std::cout << "Two! /n";
+    std::cout << "Two! \n";
     return;
   }
   if (defaultCommand->IsFinished()) {
