@@ -1,5 +1,3 @@
-#pragma once
-
 #include "frc/experimental/command/CommandGroupBase.h"
 #include "frc/experimental/command/SequentialCommandGroup.h"
 #include "frc/experimental/command/ParallelCommandGroup.h"

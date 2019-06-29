@@ -8,18 +8,15 @@
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SendableSubsystemBase.h"
 #include "frc/experimental/command/SetUtilities.h"
+#include "ErrorConfirmer.h"
+#include <regex>
+#include "mockdata/MockHooks.h"
 
 namespace frc {
 namespace experimental {
 class CommandTestBase : public ::testing::Test {
  public:
-  CommandTestBase() {
-    auto& scheduler = CommandScheduler::GetInstance();
-    scheduler.CancelAll();
-    scheduler.Enable();
-    scheduler.ClearButtons();
-    CommandGroupBase::ClearGroupedCommands();
-  }
+  CommandTestBase();
   
   class TestSubsystem : public SendableSubsystemBase {
     
@@ -63,20 +60,12 @@ class CommandTestBase : public ::testing::Test {
   };
 
  protected:
-   CommandScheduler GetScheduler() {
-    return CommandScheduler();
-   }
 
-   virtual void SetUp() {
-     HALSIM_SetDriverStationEnabled(true);
-     while (!HALSIM_GetDriverStationEnabled()) {
-       std::this_thread::sleep_for(std::chrono::milliseconds(1));
-     }
-   }
+   CommandScheduler GetScheduler();
 
-   virtual void TearDown() {
-     CommandGroupBase::ClearGroupedCommands();
-   }
+   virtual void SetUp();
+
+   virtual void TearDown();
 };
 }
 }

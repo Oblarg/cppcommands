@@ -114,15 +114,14 @@ void CommandScheduler::Run() {
 
       m_scheduledCommands.erase(iterator);
     }
+  }
 
-    //Add default commands for un-required registered subsystems.
-    for (auto&& subsystem : m_subsystems) {
-      auto s = m_requirements.find(subsystem.getFirst());
-      if (s != m_requirements.end() && s->getFirst()->GetCurrentCommand() != NULL) {
-        Schedule(s->getFirst()->GetDefaultCommand());
-      }
+  //Add default commands for un-required registered subsystems.
+  for (auto&& subsystem : m_subsystems) {
+    auto s = m_requirements.find(subsystem.getFirst());
+    if (s == m_requirements.end()) {
+      Schedule(subsystem.getSecond());
     }
-
   }
 }
 
