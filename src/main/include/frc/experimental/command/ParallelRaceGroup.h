@@ -46,7 +46,7 @@ class ParallelRaceGroup : public CommandGroupBase {
   
   void End(bool interrupted) override {
     for (auto& commandRunning : m_commands) {
-      if (commandRunning->IsFinished()) {
+      if (!commandRunning->IsFinished()) {
         commandRunning->End(true);
       }
     }
