@@ -46,7 +46,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     }
   }
   
-    void Execute() override {
+  void Execute() override {
     for (auto& commandRunning : m_commands) {
       if (!commandRunning.second) continue;
       commandRunning.first->Execute();
@@ -58,11 +58,9 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   }
   
   void End(bool interrupted) override {
-    if (interrupted) {
-      for (auto& commandRunning : m_commands) {
-        if (commandRunning.second) {
-          commandRunning.first->End(true);
-        }
+    for (auto& commandRunning : m_commands) {
+      if (commandRunning.second) {
+        commandRunning.first->End(true);
       }
     }
   }
