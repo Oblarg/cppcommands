@@ -2,10 +2,12 @@
 
 #include "CommandGroupBase.h"
 #include <wpi/ArrayRef.h>
+#include "frc/WPIErrors.h"
+#include "frc/ErrorBase.h"
 
 namespace frc {
 namespace experimental {
-class SequentialCommandGroup : public CommandGroupBase {
+class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
  public:
   SequentialCommandGroup(wpi::ArrayRef<Command*> commands) {
     AddCommands(commands);
@@ -17,7 +19,8 @@ class SequentialCommandGroup : public CommandGroupBase {
     }
     
     if (m_currentCommandIndex != -1) {
-      // Error
+      wpi_setWPIErrorWithContext(CommandIllegalUse, 
+          "Commands cannot be added to a CommandGroup while the group is running");
     }
     
     RegisterGroupedCommands(commands);
@@ -37,7 +40,7 @@ class SequentialCommandGroup : public CommandGroupBase {
     }
   }
   
-  void Execute() override {
+  void Execute() override {    
     if (m_commands.empty()) return;
     
     auto currentCommand = m_commands[m_currentCommandIndex];
@@ -53,7 +56,7 @@ class SequentialCommandGroup : public CommandGroupBase {
   }
   
   void End(bool interrupted) override {
-    if (interrupted && ! m_commands.empty()) {
+    if (interrupted && !m_commands.empty()) {
       m_commands[m_currentCommandIndex]->End(interrupted);
     }
     m_currentCommandIndex = -1;
