@@ -8,7 +8,6 @@ CommandTestBase::CommandTestBase() {
   scheduler.CancelAll();
   scheduler.Enable();
   scheduler.ClearButtons();
-  CommandGroupBase::ClearGroupedCommands();
 }
 
 CommandScheduler CommandTestBase::GetScheduler() {
@@ -23,7 +22,6 @@ void CommandTestBase::SetUp() {
 }
 
 void CommandTestBase::TearDown() {
-  CommandGroupBase::ClearGroupedCommands();
 }
 
 }

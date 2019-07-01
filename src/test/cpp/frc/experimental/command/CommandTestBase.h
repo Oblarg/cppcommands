@@ -24,6 +24,7 @@ class CommandTestBase : public ::testing::Test {
   
   class MockCommandHolder {
    public:
+    
     class MockCommand : public Command {
      public:
       MOCK_CONST_METHOD0(GetRequirements, wpi::ArrayRef<Subsystem*>());
@@ -33,13 +34,24 @@ class CommandTestBase : public ::testing::Test {
       MOCK_METHOD0(Execute, void());
       MOCK_METHOD1(End, void(bool interrupted));
 
+      MockCommand() {};
+
+      MockCommand(MockCommand&& other) = default;
+
+      MockCommand(const MockCommand& other) {};
+
       ~MockCommand() {
         auto& scheduler = CommandScheduler::GetInstance();
         scheduler.Cancel(this);
       }
+     protected:
+      std::unique_ptr<Command> TransferOwnership()&& {
+        return std::make_unique<MockCommand>(std::move(*this));
+      }
     };
     MockCommandHolder(bool runWhenDisabled, wpi::ArrayRef<Subsystem*> requirements) {
       m_requirements = requirements;
+      m_mockCommand = std::make_unique<MockCommand>();
       EXPECT_CALL(*m_mockCommand, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
       EXPECT_CALL(*m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(false));
       EXPECT_CALL(*m_mockCommand, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
@@ -51,7 +63,7 @@ class CommandTestBase : public ::testing::Test {
     }
     
     void SetFinished(bool finished) {
-      EXPECT_CALL(m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(finished));
+      EXPECT_CALL(*m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(finished));
     }
    private:
     std::vector<Subsystem*> m_requirements;
