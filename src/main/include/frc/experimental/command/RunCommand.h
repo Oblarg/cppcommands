@@ -15,6 +15,10 @@ class RunCommand : public SendableCommandBase {
     m_toRun();
   }
  protected:
+  protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<RunCommand>(std::move(*this));
+  }
   std::function<void()> m_toRun;
 };
 }

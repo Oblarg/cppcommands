@@ -71,7 +71,10 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
-  
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<SequentialCommandGroup>(std::move(*this));
+  } 
  private:
   wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   int m_currentCommandIndex{-1};

@@ -7,16 +7,17 @@ namespace frc {
 namespace experimental {
 class ConditionalCommand : public SendableCommandBase {
  public:
-  ConditionalCommand(Command* onTrue, Command* onFalse, std::function<bool()> condition)
+  ConditionalCommand(std::unique_ptr<Command>&& onTrue, std::unique_ptr<Command>&& onFalse, std::function<bool()> condition)
     : m_condition{std::move(condition)} {
-      if (!CommandGroupBase::RequireUngrouped({onTrue, onFalse})) {
+      if (!CommandGroupBase::RequireUngrouped({onTrue.get(), onFalse.get()})) {
         return;
       }
 
-      CommandGroupBase::RegisterGroupedCommands({onTrue, onFalse});
+      m_onTrue = std::move(onTrue);
+      m_onFalse = std::move(onFalse);
 
-      m_onTrue = onTrue;
-      m_onFalse = onFalse;
+      m_onTrue->SetGrouped(true);
+      m_onFalse->SetGrouped(true);
       
       AddRequirements(onTrue->GetRequirements());
       AddRequirements(onFalse->GetRequirements());
@@ -24,9 +25,9 @@ class ConditionalCommand : public SendableCommandBase {
     
     void Initialize() override {
       if (m_condition()) {
-        m_selectedCommand = m_onTrue;
+        m_selectedCommand = m_onTrue.get();
       } else {
-        m_selectedCommand = m_onFalse;
+        m_selectedCommand = m_onFalse.get();
       }
       m_selectedCommand->Initialize();
     }
@@ -43,12 +44,16 @@ class ConditionalCommand : public SendableCommandBase {
       return m_selectedCommand->IsFinished();
     }
     
-    bool RunsWhenDisabled() override {
+    bool RunsWhenDisabled() const override {
       return m_selectedCommand->RunsWhenDisabled();
     }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ConditionalCommand>(std::move(*this));
+  }
  private:
-  Command* m_onTrue;
-  Command* m_onFalse;
+  std::unique_ptr<Command> m_onTrue;
+  std::unique_ptr<Command> m_onFalse;
   std::function<bool()> m_condition;
   Command* m_selectedCommand{nullptr};
 };

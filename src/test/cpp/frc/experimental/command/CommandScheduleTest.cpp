@@ -13,7 +13,7 @@ TEST_F(CommandScheduleTest, InstantScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
   MockCommandHolder commandHolder{true, {}};
   commandHolder.SetFinished(true);
-  MockCommandHolder::MockCommand* command = commandHolder.GetMock();
+  std::unique_ptr<MockCommand> command = commandHolder.GetMock();
   
   EXPECT_CALL(*command, Initialize());
   EXPECT_CALL(*command, Execute());
@@ -28,7 +28,7 @@ TEST_F(CommandScheduleTest, InstantScheduleTest) {
 TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
   MockCommandHolder commandHolder{true, {}};
-  MockCommandHolder::MockCommand* command = commandHolder.GetMock();
+  std::unique_ptr<MockCommand> command = commandHolder.GetMock();
   
   EXPECT_CALL(*command, Initialize());
   EXPECT_CALL(*command, Execute()).Times(2);
@@ -45,11 +45,11 @@ TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
 TEST_F(CommandScheduleTest, MultiScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
   MockCommandHolder command1Holder{true, {}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   MockCommandHolder command2Holder{true, {}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
   MockCommandHolder command3Holder{true, {}};
-  MockCommandHolder::MockCommand* command3 = command3Holder.GetMock();
+  std::unique_ptr<MockCommand> command3 = command3Holder.GetMock();
   
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(2);
@@ -85,7 +85,7 @@ TEST_F(CommandScheduleTest, MultiScheduleTest) {
 TEST_F(CommandScheduleTest, SchedulerCancelTest) {
   CommandScheduler scheduler = GetScheduler();
   MockCommandHolder commandHolder{true, {}};
-  MockCommandHolder::MockCommand* command = commandHolder.GetMock();
+  std::unique_ptr<MockCommand> command = commandHolder.GetMock();
   
   EXPECT_CALL(*command, Initialize());
   EXPECT_CALL(*command, Execute());
@@ -104,7 +104,7 @@ TEST_F(CommandScheduleTest, SchedulerCancelTest) {
 TEST_F(CommandScheduleTest, NotScheduledCancelTest) {
   CommandScheduler scheduler = GetScheduler();
   MockCommandHolder commandHolder{true, {}};
-  MockCommandHolder::MockCommand* command = commandHolder.GetMock();
+  std::unique_ptr<MockCommand> command = commandHolder.GetMock();
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(command));
 }

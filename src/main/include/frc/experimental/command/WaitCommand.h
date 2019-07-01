@@ -27,10 +27,14 @@ class WaitCommand : public SendableCommandBase {
       return m_timer.HasPeriodPassed(m_duration);
     }
     
-    bool RunsWhenDisabled() override {
+    bool RunsWhenDisabled() const override {
       return true;
     }
  protected:
+  protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<WaitCommand>(std::move(*this));
+  }
   frc::Timer m_timer;
  private:
   double m_duration;

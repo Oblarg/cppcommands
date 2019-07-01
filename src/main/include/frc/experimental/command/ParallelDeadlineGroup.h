@@ -76,7 +76,10 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
-  
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ParallelDeadlineGroup>(std::move(*this));
+  } 
  private:
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   std::unique_ptr<Command> m_deadline;

@@ -14,8 +14,12 @@ class PrintCommand : public InstantCommand {
     }, {}} {
     }
     
-  bool RunsWhenDisabled() override {
+  bool RunsWhenDisabled() const override {
     return true;
+  }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<PrintCommand>(std::move(*this));
   }
 };
 }

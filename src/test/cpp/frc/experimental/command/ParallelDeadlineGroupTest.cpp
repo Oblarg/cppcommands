@@ -14,11 +14,11 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupScheduleTest){
   TestSubsystem subsystem;
 
   MockCommandHolder command1Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   MockCommandHolder command2Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
   MockCommandHolder command3Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command3 = command3Holder.GetMock();
+  std::unique_ptr<MockCommand> command3 = command3Holder.GetMock();
 
   ParallelDeadlineGroup group(command1, {command2, command3});
 
@@ -50,11 +50,11 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterruptTest){
   TestSubsystem subsystem;
 
   MockCommandHolder command1Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   MockCommandHolder command2Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
   MockCommandHolder command3Holder{true, {&subsystem}};
-  MockCommandHolder::MockCommand* command3 = command3Holder.GetMock();
+  std::unique_ptr<MockCommand> command3 = command3Holder.GetMock();
 
   ParallelDeadlineGroup group(command1, {command2, command3});
 
@@ -87,7 +87,8 @@ TEST_F(ParallelDeadlineGroupTest, SequentialGroupNotScheduledCancelTest){
   InstantCommand command1([]{}, {&subsystem});
   InstantCommand command2([]{}, {&subsystem});
 
-  ParallelDeadlineGroup group(&command1, {&command2});
+  ParallelDeadlineGroup group(std::make_unique<Command>(command1), 
+    {std::make_unique<Command>(command)});
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
 }

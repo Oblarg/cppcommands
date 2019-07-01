@@ -36,19 +36,18 @@ class CommandTestBase : public ::testing::Test {
       ~MockCommand() {
         auto& scheduler = CommandScheduler::GetInstance();
         scheduler.Cancel(this);
-        CommandGroupBase::ClearGroupedCommand(this);
       }
     };
     MockCommandHolder(bool runWhenDisabled, wpi::ArrayRef<Subsystem*> requirements) {
       m_requirements = requirements;
-      EXPECT_CALL(m_mockCommand, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
-      EXPECT_CALL(m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(false));
-      EXPECT_CALL(m_mockCommand, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
+      EXPECT_CALL(*m_mockCommand, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
+      EXPECT_CALL(*m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(false));
+      EXPECT_CALL(*m_mockCommand, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
     }
 
     
-    MockCommand* GetMock() {
-      return &m_mockCommand;
+    std::unique_ptr<MockCommand> GetMock() {
+      return m_mockCommand;
     }
     
     void SetFinished(bool finished) {
@@ -56,7 +55,7 @@ class CommandTestBase : public ::testing::Test {
     }
    private:
     std::vector<Subsystem*> m_requirements;
-    MockCommand m_mockCommand;
+    std::unique_ptr<MockCommand> m_mockCommand;
   };
 
  protected:

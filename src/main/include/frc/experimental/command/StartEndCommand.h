@@ -19,6 +19,10 @@ class StartEndCommand : public SendableCommandBase {
     m_onEnd();
   }
  protected:
+  protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<StartEndCommand>(std::move(*this));
+  }
   std::function<void()> m_onInit;
   std::function<void()> m_onEnd;
 };

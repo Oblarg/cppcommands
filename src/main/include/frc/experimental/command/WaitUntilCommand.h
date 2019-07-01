@@ -20,9 +20,13 @@ class WaitUntilCommand : public SendableCommandBase {
       return m_condition();
     }
     
-    bool RunsWhenDisabled() override {
+    bool RunsWhenDisabled() const override {
       return true;
     }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<WaitUntilCommand>(std::move(*this));
+  }
  private:
   std::function<bool()> m_condition;
 };

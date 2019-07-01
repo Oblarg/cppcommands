@@ -20,7 +20,10 @@ class InstantCommand : public SendableCommandBase {
   bool IsFinished() final override {
     return true;
   }
-
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<InstantCommand>(std::move(*this));
+  }
  private:
   std::function<void()> m_toRun;
 };

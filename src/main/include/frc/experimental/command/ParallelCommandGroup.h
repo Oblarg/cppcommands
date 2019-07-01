@@ -68,7 +68,10 @@ class ParallelCommandGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
-  
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ParallelCommandGroup>(std::move(*this));
+  } 
  private:
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   bool m_runWhenDisabled{true};

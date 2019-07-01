@@ -19,6 +19,10 @@ class NotifierCommand : public SendableCommandBase {
   void End(bool interrupted) override {
     m_notifier.Stop();
   }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<NotifierCommand>(std::move(*this));
+  }
  private:
   Notifier m_notifier;
   double m_period;

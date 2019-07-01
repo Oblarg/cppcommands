@@ -7,13 +7,13 @@ namespace frc {
 namespace experimental {
 class PerpetualCommand : public SendableCommandBase {
  public:
-  explicit PerpetualCommand(Command* command) {
+  explicit PerpetualCommand(std::unique_ptr<Command> command) {
       if (!CommandGroupBase::RequireUngrouped(command)) { 
         return; 
       }
-      m_command = command;
-      CommandGroupBase::RegisterGroupedCommands(command);
-      AddRequirements(command->GetRequirements());
+      m_command = std::move(command);
+      m_command->SetGrouped(true);
+      AddRequirements(m_command->GetRequirements());
     }
     
   void Initialize() override {
@@ -28,7 +28,7 @@ class PerpetualCommand : public SendableCommandBase {
     m_command->End(interrupted);
   }
  private:
-  Command* m_command;
+  std::unique_ptr<Command> m_command;
 };
 }
 }

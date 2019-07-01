@@ -22,8 +22,12 @@ class ScheduleCommand : public SendableCommandBase {
     return true;
   }
   
-  bool RunsWhenDisabled() override {
+  bool RunsWhenDisabled() const override {
     return true;
+  }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ScheduleCommand>(std::move(*this));
   }
  private:
   wpi::SmallVector<Command*, 4> m_toSchedule;

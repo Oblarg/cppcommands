@@ -7,8 +7,9 @@ namespace frc {
 namespace experimental {
 class CommandGroupBase : public SendableCommandBase {
  public:
+  static bool RequireUngrouped(Command& command);
   static bool RequireUngrouped(wpi::ArrayRef<std::unique_ptr<Command>>);
-  static bool RequireUngrouped(wpi::ArrayRef<Command> commands);
+  static bool RequireUngrouped(wpi::ArrayRef<Command*>);
 
   static CommandGroupBase* Sequence(std::vector<std::unique_ptr<Command>>&& commands);
   static CommandGroupBase* Parallel(std::vector<std::unique_ptr<Command>>&& commands);

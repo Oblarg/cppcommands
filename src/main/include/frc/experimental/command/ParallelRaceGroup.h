@@ -61,7 +61,10 @@ class ParallelRaceGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
-  
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ParallelRaceGroup>(std::move(*this));
+  } 
  private:
   std::set<Command*> m_commands;
   bool m_runWhenDisabled{true};

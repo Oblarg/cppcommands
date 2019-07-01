@@ -51,46 +51,52 @@ void Command::End(bool interrupted) {}
 std::unique_ptr<Command> Command::WithTimeout(double seconds)&& {
   return std::make_unique<ParallelRaceGroup>(
     std::vector<std::unique_ptr<Command>>{
-      std::make_unique<Command>(std::move(*this)), 
+      std::move(*this).TransferOwnership(), 
       std::make_unique<WaitCommand>(seconds)});
 }
 
-Command* Command::InterruptOn(std::function<bool()> condition) {
-  return new ParallelRaceGroup({this, new WaitUntilCommand(std::move(condition))});
+std::unique_ptr<Command> Command::InterruptOn(std::function<bool()> condition)&& {
+  return std::make_unique<ParallelRaceGroup>(
+    std::vector<std::unique_ptr<Command>>{
+      std::move(*this).TransferOwnership(), 
+      std::make_unique<WaitUntilCommand>(condition)});
 }
 
-Command* Command::WhenFinished(std::function<void()> toRun) {
-  return new SequentialCommandGroup({this, new InstantCommand(std::move(toRun), {})});
+std::unique_ptr<Command> Command::WhenFinished(std::function<void()> toRun)&& {
+  return std::make_unique<SequentialCommandGroup>(
+    std::vector<std::unique_ptr<Command>>{
+      std::move(*this).TransferOwnership(), 
+      std::make_unique<InstantCommand>(toRun)});
 }
 
-Command* Command::BeforeStarting(std::function<void()> toRun) {
-  return new SequentialCommandGroup({new InstantCommand(std::move(toRun), {}), this});
+std::unique_ptr<Command> Command::BeforeStarting(std::function<void()> toRun)&& {
+  return std::make_unique<SequentialCommandGroup>(
+    std::vector<std::unique_ptr<Command>>{
+      std::make_unique<InstantCommand>(toRun)}),
+      std::move(*this).TransferOwnership();
 }
 
-Command* Command::AndThen(wpi::ArrayRef<Command*> next) {
-  auto group = new SequentialCommandGroup(this);
-  group->AddCommands({next});
-  return group;
+std::unique_ptr<Command> Command::AndThen(std::vector<std::unique_ptr<Command>>&& next)&& {
+  next.insert(next.begin(), std::move(*this).TransferOwnership());
+  return std::make_unique<SequentialCommandGroup>(next);
 }
 
-Command* Command::DeadlineWith(wpi::ArrayRef<Command*> parallel) {
-  return new ParallelDeadlineGroup({this, parallel});
+std::unique_ptr<Command> Command::DeadlineWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+  return std::make_unique<SequentialCommandGroup>(std::move(*this).TransferOwnership(), next);
 }
 
-Command* Command::AlongWith(wpi::ArrayRef<Command*> parallel) {
-  auto group = new ParallelCommandGroup(this);
-  group->AddCommands({parallel});
-  return group;
+std::unique_ptr<Command> Command::AlongWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+  next.insert(next.begin(), std::move(*this).TransferOwnership());
+  return std::make_unique<ParallelCommandGroup>(next);
 }
 
-Command* Command::RaceWith(wpi::ArrayRef<Command*> parallel) {
-  auto group = new ParallelRaceGroup(this);
-  group->AddCommands({parallel});
-  return group;
+std::unique_ptr<Command> Command::RaceWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+  next.insert(next.begin(), std::move(*this).TransferOwnership());
+  return std::make_unique<ParallelRaceGroup>(next);
 }
 
-Command* Command::Perpetually()  {
-  return new PerpetualCommand(this);
+std::unique_ptr<Command> Command::Perpetually()&&  {
+  return std::make_unique<PerpetualCommand>(std::move(*this).TransferOwnership());
 }
 
 void Command::Schedule(bool interruptible) {

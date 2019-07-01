@@ -25,10 +25,10 @@ class Command {
   std::unique_ptr<Command> InterruptOn(std::function<bool()> condition)&&;
   std::unique_ptr<Command> WhenFinished(std::function<void()> toRun)&&;
   std::unique_ptr<Command> BeforeStarting(std::function<void()> toRun)&&;
-  std::unique_ptr<Command> AndThen(wpi::ArrayRef<Command*> next)&&;
-  std::unique_ptr<Command> DeadlineWith(wpi::ArrayRef<Command*> parallel)&&;
-  std::unique_ptr<Command> AlongWith(wpi::ArrayRef<Command*> parallel)&&;
-  std::unique_ptr<Command> RaceWith(wpi::ArrayRef<Command*> parallel)&&;
+  std::unique_ptr<Command> AndThen(std::vector<std::unique_ptr<Command>>&& next)&&;
+  std::unique_ptr<Command> DeadlineWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
+  std::unique_ptr<Command> AlongWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
+  std::unique_ptr<Command> RaceWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
   std::unique_ptr<Command> Perpetually()&&;
   void Schedule(bool interruptible);
   void Schedule() { Schedule(true); }
@@ -39,7 +39,8 @@ class Command {
   void SetGrouped(bool grouped);
   virtual bool RunsWhenDisabled() const { return false; }
   virtual std::string GetName() const;
- private:
+ protected:
+  virtual std::unique_ptr<Command> TransferOwnership()&&;
   bool m_isGrouped = false;
 };
 }

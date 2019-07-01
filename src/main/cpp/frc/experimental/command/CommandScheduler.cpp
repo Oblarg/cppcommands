@@ -29,8 +29,7 @@ CommandScheduler& CommandScheduler::GetInstance() {
 }
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
-  auto& groupedCommands = CommandGroupBase::GetGroupedCommands();
-  if (ContainsKey(groupedCommands, command)) {
+  if (command->IsGrouped()) {
     wpi_setWPIErrorWithContext(CommandIllegalUse,
         "A command that is part of a command group cannot be independently scheduled");
     return;

@@ -21,9 +21,9 @@ TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
   TestSubsystem requirement;
 
   MockCommandHolder command1Holder{true, {&requirement}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   MockCommandHolder command2Holder{true, {&requirement}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute());
@@ -50,9 +50,9 @@ TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
   TestSubsystem requirement;
 
   MockCommandHolder command1Holder{true, {&requirement}};
-  MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+  std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   MockCommandHolder command2Holder{true, {&requirement}};
-  MockCommandHolder::MockCommand* command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(2);
@@ -148,7 +148,8 @@ TEST_F(CommandRequirementsTest, ParallelDeadlineRequirementTest) {
   Command* command2 = new InstantCommand([]{},{&requirement3});
   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
-  Command* group = new ParallelDeadlineGroup({command1, command2});
+  Command* group = new ParallelDeadlineGroup(std::make_unique<Command>(command1), 
+    {std::make_unique<Command>(command2)});
 
   scheduler.Schedule(group);
   scheduler.Schedule(command3);
@@ -169,7 +170,9 @@ TEST_F(CommandRequirementsTest, ConditionalCommandRequirementTest) {
   Command* command2 = new InstantCommand([]{},{&requirement3});
   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
-  Command* conditional = new ConditionalCommand(command1, command2, []{return true;});
+  Command* conditional = new ConditionalCommand(
+    std::make_unique<Command>(command1), 
+    std::make_unique<Command>(command2), []{return true;});
 
   scheduler.Schedule(conditional);
   scheduler.Schedule(command3);
@@ -190,7 +193,9 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   Command* command2 = new InstantCommand([]{},{&requirement3});
   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
 
-  Command* select = new SelectCommand<int>({{1, command1}, {2, command2}}, []{return 1;});
+  Command* select = new SelectCommand<int>(
+    {{1, std::make_unique<Command>(command1)}, 
+    {2, std::make_unique<Command>(command2)}}, []{return 1;});
 
   scheduler.Schedule(select);
   scheduler.Schedule(command3);
@@ -204,7 +209,7 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
 //   ErrorConfirmer confirmer("require");
 
 //   MockCommandHolder command1Holder{true, {}};
-//   MockCommandHolder::MockCommand* command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
   
 //   //TODO: actually test for correct error triggering
 //   requirement1.SetDefaultCommand(command1);

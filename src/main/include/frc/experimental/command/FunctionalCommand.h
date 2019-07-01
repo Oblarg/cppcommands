@@ -26,6 +26,10 @@ class FunctionalCommand : public SendableCommandBase {
     bool IsFinished() override {
       return m_isFinished();
     }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<FunctionalCommand>(std::move(*this));
+  }
  private:
   std::function<void()> m_onInit;
   std::function<void()> m_onExecute;
