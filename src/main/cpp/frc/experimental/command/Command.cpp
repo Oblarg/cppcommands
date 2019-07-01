@@ -48,56 +48,56 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-std::unique_ptr<Command> Command::WithTimeout(double seconds)&& {
-  return std::make_unique<ParallelRaceGroup>(
-    std::vector<std::unique_ptr<Command>>{
-      std::move(*this).TransferOwnership(), 
-      std::make_unique<WaitCommand>(seconds)});
-}
+// std::unique_ptr<Command> Command::WithTimeout(double seconds)&& {
+//   return std::make_unique<ParallelRaceGroup>(
+//     std::vector<std::unique_ptr<Command>>{
+//       std::move(*this).TransferOwnership(), 
+//       std::make_unique<WaitCommand>(seconds)});
+// }
 
-std::unique_ptr<Command> Command::InterruptOn(std::function<bool()> condition)&& {
-  return std::make_unique<ParallelRaceGroup>(
-    std::vector<std::unique_ptr<Command>>{
-      std::move(*this).TransferOwnership(), 
-      std::make_unique<WaitUntilCommand>(condition)});
-}
+// std::unique_ptr<Command> Command::InterruptOn(std::function<bool()> condition)&& {
+//   return std::make_unique<ParallelRaceGroup>(
+//     std::vector<std::unique_ptr<Command>>{
+//       std::move(*this).TransferOwnership(), 
+//       std::make_unique<WaitUntilCommand>(condition)});
+// }
 
-std::unique_ptr<Command> Command::WhenFinished(std::function<void()> toRun)&& {
-  return std::make_unique<SequentialCommandGroup>(
-    std::vector<std::unique_ptr<Command>>{
-      std::move(*this).TransferOwnership(), 
-      std::make_unique<InstantCommand>(toRun)});
-}
+// std::unique_ptr<Command> Command::WhenFinished(std::function<void()> toRun)&& {
+//   return std::make_unique<SequentialCommandGroup>(
+//     std::vector<std::unique_ptr<Command>>{
+//       std::move(*this).TransferOwnership(), 
+//       std::make_unique<InstantCommand>(toRun)});
+// }
 
-std::unique_ptr<Command> Command::BeforeStarting(std::function<void()> toRun)&& {
-  return std::make_unique<SequentialCommandGroup>(
-    std::vector<std::unique_ptr<Command>>{
-      std::make_unique<InstantCommand>(toRun)}),
-      std::move(*this).TransferOwnership();
-}
+// std::unique_ptr<Command> Command::BeforeStarting(std::function<void()> toRun)&& {
+//   return std::make_unique<SequentialCommandGroup>(
+//     std::vector<std::unique_ptr<Command>>{
+//       std::make_unique<InstantCommand>(toRun)}),
+//       std::move(*this).TransferOwnership();
+// }
 
-std::unique_ptr<Command> Command::AndThen(std::vector<std::unique_ptr<Command>>&& next)&& {
-  next.insert(next.begin(), std::move(*this).TransferOwnership());
-  return std::make_unique<SequentialCommandGroup>(next);
-}
+// std::unique_ptr<Command> Command::AndThen(std::vector<std::unique_ptr<Command>>&& next)&& {
+//   next.insert(next.begin(), std::move(*this).TransferOwnership());
+//   return std::make_unique<SequentialCommandGroup>(next);
+// }
 
-std::unique_ptr<Command> Command::DeadlineWith(std::vector<std::unique_ptr<Command>>&& next)&& {
-  return std::make_unique<SequentialCommandGroup>(std::move(*this).TransferOwnership(), next);
-}
+// std::unique_ptr<Command> Command::DeadlineWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+//   return std::make_unique<SequentialCommandGroup>(std::move(*this).TransferOwnership(), next);
+// }
 
-std::unique_ptr<Command> Command::AlongWith(std::vector<std::unique_ptr<Command>>&& next)&& {
-  next.insert(next.begin(), std::move(*this).TransferOwnership());
-  return std::make_unique<ParallelCommandGroup>(next);
-}
+// std::unique_ptr<Command> Command::AlongWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+//   next.insert(next.begin(), std::move(*this).TransferOwnership());
+//   return std::make_unique<ParallelCommandGroup>(next);
+// }
 
-std::unique_ptr<Command> Command::RaceWith(std::vector<std::unique_ptr<Command>>&& next)&& {
-  next.insert(next.begin(), std::move(*this).TransferOwnership());
-  return std::make_unique<ParallelRaceGroup>(next);
-}
+// std::unique_ptr<Command> Command::RaceWith(std::vector<std::unique_ptr<Command>>&& next)&& {
+//   next.insert(next.begin(), std::move(*this).TransferOwnership());
+//   return std::make_unique<ParallelRaceGroup>(next);
+// }
 
-std::unique_ptr<Command> Command::Perpetually()&&  {
-  return std::make_unique<PerpetualCommand>(std::move(*this).TransferOwnership());
-}
+// std::unique_ptr<Command> Command::Perpetually()&&  {
+//   return std::make_unique<PerpetualCommand>(std::move(*this).TransferOwnership());
+// }
 
 void Command::Schedule(bool interruptible) {
   CommandScheduler::GetInstance().Schedule(interruptible, this);
