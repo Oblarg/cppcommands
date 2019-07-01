@@ -11,6 +11,8 @@ class ScheduleCommand : public SendableCommandBase {
   explicit ScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
     SetInsert(m_toSchedule, toSchedule);
   }
+
+  ScheduleCommand(ScheduleCommand&& other) = default;
   
   void Initialize() override {
     for (auto command : m_toSchedule) {

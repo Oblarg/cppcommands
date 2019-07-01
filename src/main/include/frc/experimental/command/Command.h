@@ -15,6 +15,8 @@ std::string GetTypeName(const T& type) {
 class Subsystem;
 class Command {
  public:
+  Command() = default;
+  Command(Command&& other) = default;
   virtual ~Command() = default;
   virtual void Initialize();
   virtual void Execute();
@@ -40,7 +42,7 @@ class Command {
   virtual bool RunsWhenDisabled() const { return false; }
   virtual std::string GetName() const;
  protected:
-  virtual std::unique_ptr<Command> TransferOwnership()&&;
+  virtual std::unique_ptr<Command> TransferOwnership()&& = 0;
   bool m_isGrouped = false;
 };
 }

@@ -10,6 +10,8 @@ class InstantCommand : public SendableCommandBase {
     AddRequirements(requirements);
   }
 
+  InstantCommand(InstantCommand&& other) = default;
+
   InstantCommand() : m_toRun{[]{}} {
   }
 

@@ -9,6 +9,8 @@ namespace frc {
 namespace experimental {
 class SendableCommandBase : public Sendable, public Command {
  public:
+  SendableCommandBase(SendableCommandBase&& other) = default;
+
   void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
 
   wpi::ArrayRef<Subsystem*> GetRequirements() const override;

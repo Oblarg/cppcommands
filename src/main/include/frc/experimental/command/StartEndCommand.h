@@ -10,6 +10,8 @@ class StartEndCommand : public SendableCommandBase {
     : m_onInit{std::move(onInit)}, m_onEnd{std::move(onEnd)} {
     AddRequirements(requirements);
   }
+
+  StartEndCommand(StartEndCommand&& other) = default;
   
   void Initialize() override {
     m_onInit();

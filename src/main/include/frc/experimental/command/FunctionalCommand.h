@@ -10,6 +10,17 @@ class FunctionalCommand : public SendableCommandBase {
   FunctionalCommand(std::function<void()> onInit, std::function<void()> onExecute, std::function<void(bool)> onEnd, std::function<bool()> isFinished)
     : m_onInit{std::move(onInit)}, m_onExecute{std::move(onExecute)}, m_onEnd{std::move(onEnd)}, m_isFinished{std::move(isFinished)} {
     }
+
+    FunctionalCommand(FunctionalCommand&& other) = default;
+
+    // FunctionalCommand(FunctionalCommand&& other)
+    //   : SendableCommandBase(std::move(other)),
+    //   m_onInit(std::move(other.m_onInit)),
+    //   m_onExecute(std::move(other.m_onExecute)),
+    //   m_onEnd(std::move(other.m_onEnd)),
+    //   m_isFinished(std::move(other.m_isFinished)) {
+    //     m_isGrouped = other.m_isGrouped;
+    //   }
     
     void Initialize() override {
       m_onInit();

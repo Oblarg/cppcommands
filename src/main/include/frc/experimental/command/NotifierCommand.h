@@ -11,6 +11,8 @@ class NotifierCommand : public SendableCommandBase {
     m_notifier{std::move(toRun)}, m_period{period} {
       AddRequirements(requirements);
   }
+
+  NotifierCommand(NotifierCommand&& other) = default;
   
   void Initialize() override {
     m_notifier.StartPeriodic(m_period);

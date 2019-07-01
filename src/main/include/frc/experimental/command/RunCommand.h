@@ -10,6 +10,8 @@ class RunCommand : public SendableCommandBase {
     : m_toRun{std::move(toRun)} {
       AddRequirements(requirements);
     }
+
+  RunCommand(RunCommand&& other) = default;
     
   void Execute() override {
     m_toRun();

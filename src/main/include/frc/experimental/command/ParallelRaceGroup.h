@@ -11,6 +11,8 @@ class ParallelRaceGroup : public CommandGroupBase {
     AddCommands(std::move(commands));
   }
 
+  ParallelRaceGroup(ParallelRaceGroup&& other) = default;
+
   //TODO: add copy constructor that makes deep copy?
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
   
@@ -66,7 +68,7 @@ class ParallelRaceGroup : public CommandGroupBase {
     return std::make_unique<ParallelRaceGroup>(std::move(*this));
   } 
  private:
-  std::set<Command*> m_commands;
+  std::set<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
   bool m_finished{false};
 };

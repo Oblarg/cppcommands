@@ -15,6 +15,8 @@ class PerpetualCommand : public SendableCommandBase {
       m_command->SetGrouped(true);
       AddRequirements(m_command->GetRequirements());
     }
+
+  PerpetualCommand(PerpetualCommand&& other) = default;
     
   void Initialize() override {
     m_command->Initialize();

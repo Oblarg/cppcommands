@@ -11,6 +11,8 @@ class ParallelCommandGroup : public CommandGroupBase {
     AddCommands(std::move(commands));
   }
 
+  ParallelCommandGroup(ParallelCommandGroup&& other) = default;
+
   //TODO: add copy constructor that makes a deep copy?
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 

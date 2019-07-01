@@ -8,21 +8,23 @@ namespace experimental {
 class ParallelDeadlineGroup : public CommandGroupBase {
  public:
   ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) 
-      : m_deadline{std::move(deadline)} {
+      : m_deadline{deadline.get()} {
     AddCommands(std::move(commands));
     m_deadline->SetGrouped(true);
-    m_commands[m_deadline] = false;
+    m_commands[std::move(deadline)] = false;
     AddRequirements(m_deadline->GetRequirements());
     m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
   }
+
+  ParallelDeadlineGroup(ParallelDeadlineGroup&& other) = default;
 
   //TODO: add copy constructor that makes deep copy?
   ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
   
   void SetDeadline(std::unique_ptr<Command>&& deadline) {
-    m_deadline = std::move(deadline);
+    m_deadline = deadline.get();
     m_deadline->SetGrouped(true);
-    m_commands[m_deadline] = false;
+    m_commands[std::move(deadline)] = false;
     AddRequirements(m_deadline->GetRequirements());
     m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
   }
@@ -82,7 +84,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   } 
  private:
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
-  std::unique_ptr<Command> m_deadline;
+  Command* m_deadline;
   bool m_runWhenDisabled{true};
 };
 }

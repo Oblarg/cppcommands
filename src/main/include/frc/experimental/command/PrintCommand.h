@@ -13,6 +13,8 @@ class PrintCommand : public InstantCommand {
       wpi::outs() << str << "\n";
     }, {}} {
     }
+
+  PrintCommand(PrintCommand&& other) = default;
     
   bool RunsWhenDisabled() const override {
     return true;

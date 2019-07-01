@@ -29,6 +29,8 @@ class SelectCommand : public SendableCommandBase {
   explicit SelectCommand(std::function<Command*()> toRun) 
     : m_toRun{toRun} {
   }
+
+  SelectCommand(SelectCommand&& other) = default;
   
   void Initialize() override;
   

@@ -13,6 +13,8 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
     AddCommands(std::move(commands));
   }
 
+  SequentialCommandGroup(SequentialCommandGroup&& other) = default;
+  
   //TODO: add copy constructor that makes deep copy?
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
  

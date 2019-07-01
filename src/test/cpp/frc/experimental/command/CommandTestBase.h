@@ -46,8 +46,8 @@ class CommandTestBase : public ::testing::Test {
     }
 
     
-    std::unique_ptr<MockCommand> GetMock() {
-      return m_mockCommand;
+    std::unique_ptr<MockCommand>&& GetMock() {
+      return std::move(m_mockCommand);
     }
     
     void SetFinished(bool finished) {

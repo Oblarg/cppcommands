@@ -22,6 +22,16 @@ class ConditionalCommand : public SendableCommandBase {
       AddRequirements(onTrue->GetRequirements());
       AddRequirements(onFalse->GetRequirements());
     }
+
+    ConditionalCommand(ConditionalCommand&& other) = default;
+
+    // ConditionalCommand(ConditionalCommand&& other) 
+    //   : SendableCommandBase(std::move(other)),
+    //   m_onTrue(std::move(other.m_onTrue)), 
+    //   m_onFalse(std::move(other.m_onFalse)),
+    //   m_condition(std::move(other.m_condition)) {
+    //     m_isGrouped = other.m_isGrouped;
+    // }
     
     void Initialize() override {
       if (m_condition()) {

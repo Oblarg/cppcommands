@@ -12,6 +12,8 @@ class ProxyScheduleCommand : public SendableCommandBase {
     SetInsert(m_toSchedule, toSchedule);
   }
 
+  ProxyScheduleCommand(ProxyScheduleCommand&& other) = default;
+
   void Initialize() override {
     m_finished = false;
     for (auto* command : m_toSchedule) {
