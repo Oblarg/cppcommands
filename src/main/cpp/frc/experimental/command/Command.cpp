@@ -48,8 +48,11 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-Command* Command::WithTimeout(double seconds) {
-  return new ParallelRaceGroup({this, new WaitCommand(seconds)});
+std::unique_ptr<Command> Command::WithTimeout(double seconds)&& {
+  return std::make_unique<ParallelRaceGroup>(
+    std::vector<std::unique_ptr<Command>>{
+      std::make_unique<Command>(std::move(*this)), 
+      std::make_unique<WaitCommand>(seconds)});
 }
 
 Command* Command::InterruptOn(std::function<bool()> condition) {
@@ -114,4 +117,10 @@ std::string Command::GetName() const {
   return GetTypeName(*this);
 }
 
+bool Command::IsGrouped() const {
+  return m_isGrouped;
+}
 
+void Command::SetGrouped(bool grouped) {
+  m_isGrouped = grouped;
+}

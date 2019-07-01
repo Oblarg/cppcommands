@@ -87,6 +87,9 @@
     "xthread": "cpp",
     "xlocmon": "cpp",
     "xloctime": "cpp",
-    "regex": "cpp"
+    "regex": "cpp",
+    "locale": "cpp",
+    "xlocbuf": "cpp",
+    "xlocmes": "cpp"
   }
 }

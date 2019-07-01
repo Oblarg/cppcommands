@@ -14,19 +14,22 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
 return map.find(keyToCheck) != map.end();
 }
 
-  void CommandGroupBase::RegisterGroupedCommands(wpi::ArrayRef<Command*> commands) {
-      GetGroupedCommands().insert(commands.begin(), commands.end());
+  bool CommandGroupBase::RequireUngrouped(wpi::ArrayRef<std::unique_ptr<Command>> commands) {
+    bool allUngrouped = true;
+    for(auto&& command : commands) {
+    allUngrouped &= !command.get()->IsGrouped();
+    }
+    if (!allUngrouped) {
+    wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
+        "Commands cannot be added to more than one CommandGroup");
+    }
+    return allUngrouped;
   }
-  void CommandGroupBase::ClearGroupedCommands() {
-      GetGroupedCommands().clear();
-  }
-  void CommandGroupBase::ClearGroupedCommand(Command* command) {
-      GetGroupedCommands().erase(command);
-  }
-  bool CommandGroupBase::RequireUngrouped(wpi::ArrayRef<Command*> commands) {
+
+  bool CommandGroupBase::RequireUngrouped(wpi::ArrayRef<Command> commands) {
       bool allUngrouped = true;
       for(auto&& command : commands) {
-        allUngrouped &= !ContainsKey(GetGroupedCommands(), command);
+        allUngrouped &= command.IsGrouped();
       }
       if (!allUngrouped) {
         wpi_setGlobalWPIErrorWithContext(CommandIllegalUse,
@@ -34,21 +37,16 @@ return map.find(keyToCheck) != map.end();
       }
       return allUngrouped;
   }
-  
-  std::set<Command*>& CommandGroupBase::GetGroupedCommands() {
-    static std::set<Command*> groupedCommands;
-    return groupedCommands;
-  }
 
-  CommandGroupBase* CommandGroupBase::Sequence(wpi::ArrayRef<Command*> commands) {
-      return new SequentialCommandGroup(commands);
+  CommandGroupBase* CommandGroupBase::Sequence(std::vector<std::unique_ptr<Command>>&& commands) {
+      return new SequentialCommandGroup(std::move(commands));
   }
-  CommandGroupBase* CommandGroupBase::Parallel(wpi::ArrayRef<Command*> commands) {
-      return new ParallelCommandGroup(commands);
+  CommandGroupBase* CommandGroupBase::Parallel(std::vector<std::unique_ptr<Command>>&& commands) {
+      return new ParallelCommandGroup(std::move(commands));
   }
-  CommandGroupBase* CommandGroupBase::Race(wpi::ArrayRef<Command*> commands) {
-      return new ParallelRaceGroup(commands);
+  CommandGroupBase* CommandGroupBase::Race(std::vector<std::unique_ptr<Command>>&& commands) {
+      return new ParallelRaceGroup(std::move(commands));
   }
-  CommandGroupBase* CommandGroupBase::Deadline(Command* deadline, wpi::ArrayRef<Command*> commands) {
-      return new ParallelDeadlineGroup(deadline, commands);
+  CommandGroupBase* CommandGroupBase::Deadline(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) {
+      return new ParallelDeadlineGroup(std::move(deadline), std::move(commands));
   }

@@ -7,18 +7,15 @@ namespace frc {
 namespace experimental {
 class CommandGroupBase : public SendableCommandBase {
  public:
-  static void RegisterGroupedCommands(wpi::ArrayRef<Command*> commands);
-  static void ClearGroupedCommands();
-  static void ClearGroupedCommand(Command* command);
-  static bool RequireUngrouped(wpi::ArrayRef<Command*> commands);
-  static std::set<Command*>& GetGroupedCommands();
+  static bool RequireUngrouped(wpi::ArrayRef<std::unique_ptr<Command>>);
+  static bool RequireUngrouped(wpi::ArrayRef<Command> commands);
 
-  static CommandGroupBase* Sequence(wpi::ArrayRef<Command*> commands);
-  static CommandGroupBase* Parallel(wpi::ArrayRef<Command*> commands);
-  static CommandGroupBase* Race(wpi::ArrayRef<Command*> commands);
-  static CommandGroupBase* Deadline(Command* deadline, wpi::ArrayRef<Command*> commands);
+  static CommandGroupBase* Sequence(std::vector<std::unique_ptr<Command>>&& commands);
+  static CommandGroupBase* Parallel(std::vector<std::unique_ptr<Command>>&& commands);
+  static CommandGroupBase* Race(std::vector<std::unique_ptr<Command>>&& commands);
+  static CommandGroupBase* Deadline(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands);
 
-  virtual void AddCommands(wpi::ArrayRef<Command*> commands) = 0;
+  virtual void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) = 0;
 };
 }
 }

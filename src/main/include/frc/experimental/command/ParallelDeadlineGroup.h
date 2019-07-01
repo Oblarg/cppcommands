@@ -7,35 +7,39 @@ namespace frc {
 namespace experimental {
 class ParallelDeadlineGroup : public CommandGroupBase {
  public:
-  ParallelDeadlineGroup(Command* deadline, wpi::ArrayRef<Command*> commands) 
-      : m_deadline{deadline} {
-    AddCommands(commands);
-    if (m_commands.find(deadline) == m_commands.end()) {
-      AddCommands({deadline});
-    }
+  ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) 
+      : m_deadline{std::move(deadline)} {
+    AddCommands(std::move(commands));
+    m_deadline->SetGrouped(true);
+    m_commands[m_deadline] = false;
+    AddRequirements(m_deadline->GetRequirements());
+    m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
+  }
+
+  //TODO: add copy constructor that makes deep copy?
+  ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
+  
+  void SetDeadline(std::unique_ptr<Command>&& deadline) {
+    m_deadline = std::move(deadline);
+    m_deadline->SetGrouped(true);
+    m_commands[m_deadline] = false;
+    AddRequirements(m_deadline->GetRequirements());
+    m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
   }
   
-  void SetDeadline(Command* deadline) {
-    if (m_commands.find(deadline) == m_commands.end()) {
-      AddCommands({deadline});
-    }
-    m_deadline = deadline;
-  }
-  
-  void AddCommands(wpi::ArrayRef<Command*> commands) override {
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {
       return;
     }
     
     // TODO: Running Group
     
-    RegisterGroupedCommands(commands);
-    
     // TODO: Disjoint
-    for(auto command : commands) {
-      m_commands[command] = false;
+    for(auto&& command : commands) {
+      command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      m_commands[std::move(command)] = false;
     }
   }
   
@@ -69,13 +73,13 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     return m_deadline->IsFinished();
   }
   
-  bool RunsWhenDisabled() override {
+  bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
   
  private:
-  std::unordered_map<Command*, bool> m_commands;
-  Command* m_deadline;
+  std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
+  std::unique_ptr<Command> m_deadline;
   bool m_runWhenDisabled{true};
 };
 }

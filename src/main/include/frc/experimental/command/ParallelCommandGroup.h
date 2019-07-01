@@ -7,24 +7,26 @@ namespace frc {
 namespace experimental {
 class ParallelCommandGroup : public CommandGroupBase {
  public:
-  ParallelCommandGroup(wpi::ArrayRef<Command*> commands) {
-    AddCommands(commands);
+  ParallelCommandGroup(std::vector<std::unique_ptr<Command>>&& commands) {
+    AddCommands(std::move(commands));
   }
-  
-  void AddCommands(wpi::ArrayRef<Command*> commands) override {
+
+  //TODO: add copy constructor that makes a deep copy?
+  ParallelCommandGroup(const ParallelCommandGroup&) = delete;
+
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {
       return;
     }
     
     // TODO: Running Group
     
-    RegisterGroupedCommands(commands);
-    
     // TODO: Disjoint
-    for(auto command : commands) {
-      m_commands[command] = false;
+    for(auto&& command : commands) {
+      command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      m_commands[std::move(command)] = false;
     }
   }
   
@@ -63,12 +65,12 @@ class ParallelCommandGroup : public CommandGroupBase {
     return true;
   }
   
-  bool RunsWhenDisabled() override {
+  bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
   
  private:
-  std::unordered_map<Command*, bool> m_commands;
+  std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   bool m_runWhenDisabled{true};
 };
 }

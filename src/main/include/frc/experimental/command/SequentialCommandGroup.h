@@ -9,11 +9,14 @@ namespace frc {
 namespace experimental {
 class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
  public:
-  SequentialCommandGroup(wpi::ArrayRef<Command*> commands) {
-    AddCommands(commands);
+  SequentialCommandGroup(std::vector<std::unique_ptr<Command>>&& commands) {
+    AddCommands(std::move(commands));
   }
+
+  //TODO: add copy constructor that makes deep copy?
+  SequentialCommandGroup(const SequentialCommandGroup&) = delete;
  
-  void AddCommands(wpi::ArrayRef<Command*> commands) final {
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final {
     if (!RequireUngrouped(commands)) {
       return;
     }
@@ -22,13 +25,12 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
       wpi_setWPIErrorWithContext(CommandIllegalUse, 
           "Commands cannot be added to a CommandGroup while the group is running");
     }
-    
-    RegisterGroupedCommands(commands);
-    
-    for(auto command : commands) {
-      m_commands.emplace_back(command);
+        
+    for(auto&& command : commands) {
+      command->SetGrouped(true);
       AddRequirements(command->GetRequirements());
       m_runWhenDisabled &= command->RunsWhenDisabled();
+      m_commands.emplace_back(std::move(command));
     }
   }
   
@@ -43,7 +45,7 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
   void Execute() override {    
     if (m_commands.empty()) return;
     
-    auto currentCommand = m_commands[m_currentCommandIndex];
+    auto& currentCommand = m_commands[m_currentCommandIndex];
     
     currentCommand->Execute();
     if (currentCommand->IsFinished()) {
@@ -66,12 +68,12 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
     return m_currentCommandIndex == m_commands.size();
   }
   
-  bool RunsWhenDisabled() override {
+  bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
   
  private:
-  wpi::SmallVector<Command*, 4> m_commands;
+  wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   int m_currentCommandIndex{-1};
   bool m_runWhenDisabled{true};
 };
