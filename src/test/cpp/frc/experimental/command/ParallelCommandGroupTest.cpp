@@ -14,9 +14,9 @@
 //   TestSubsystem subsystem;
 
 //   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
 //   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
 
 //   ParallelCommandGroup group({command1, command2});
 
@@ -44,9 +44,9 @@
 //   TestSubsystem subsystem;
 
 //   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
 //   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
 
 //   ParallelCommandGroup group({command1, command2});
 

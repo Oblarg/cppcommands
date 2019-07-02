@@ -12,7 +12,7 @@
 // TEST_F(ButtonTest, WhenPressedTest) {
 //   auto& scheduler = CommandScheduler::GetInstance();
 //   MockCommandHolder command1Holder{true, {}};
-//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
 
 //   InternalButton button;
 

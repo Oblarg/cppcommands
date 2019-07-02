@@ -21,9 +21,9 @@
 //   TestSubsystem requirement;
 
 //   MockCommandHolder command1Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
 //   MockCommandHolder command2Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
 
 //   EXPECT_CALL(*command1, Initialize());
 //   EXPECT_CALL(*command1, Execute());
@@ -50,9 +50,9 @@
 //   TestSubsystem requirement;
 
 //   MockCommandHolder command1Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
 //   MockCommandHolder command2Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommand> command2 = command2Holder.GetMock();
+//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
 
 //   EXPECT_CALL(*command1, Initialize());
 //   EXPECT_CALL(*command1, Execute()).Times(2);
@@ -209,7 +209,7 @@
 // //   ErrorConfirmer confirmer("require");
 
 // //   MockCommandHolder command1Holder{true, {}};
-// //   std::unique_ptr<MockCommand> command1 = command1Holder.GetMock();
+// //   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
   
 // //   //TODO: actually test for correct error triggering
 // //   requirement1.SetDefaultCommand(command1);

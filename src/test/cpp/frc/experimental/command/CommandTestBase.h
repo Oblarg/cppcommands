@@ -21,11 +21,10 @@ class CommandTestBase : public ::testing::Test {
   class TestSubsystem : public SendableSubsystemBase {
     
   };
-  
-  class MockCommandHolder {
-   public:
-    
-    class MockCommand : public Command {
+
+ protected:
+
+  class MockCommand : public Command {
      public:
       MOCK_CONST_METHOD0(GetRequirements, wpi::ArrayRef<Subsystem*>());
       MOCK_METHOD0(IsFinished, bool());
@@ -34,11 +33,20 @@ class CommandTestBase : public ::testing::Test {
       MOCK_METHOD0(Execute, void());
       MOCK_METHOD1(End, void(bool interrupted));
 
-      MockCommand() {};
+      MockCommand(wpi::ArrayRef<Subsystem*> requirements, bool finished = false, bool runWhenDisabled = true) {
+        m_requirements = requirements;
+        EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
+        EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(finished));
+        EXPECT_CALL(*this, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
+      };
 
       MockCommand(MockCommand&& other) = default;
 
       MockCommand(const MockCommand& other) {};
+
+      void SetFinished(bool finished) {
+      EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(finished));
+      }
 
       ~MockCommand() {
         auto& scheduler = CommandScheduler::GetInstance();
@@ -48,35 +56,15 @@ class CommandTestBase : public ::testing::Test {
       std::unique_ptr<Command> TransferOwnership()&& {
         return std::make_unique<MockCommand>(std::move(*this));
       }
+     private:
+      std::vector<Subsystem*> m_requirements;
     };
-    MockCommandHolder(bool runWhenDisabled, wpi::ArrayRef<Subsystem*> requirements) {
-      m_requirements = requirements;
-      m_mockCommand = std::make_unique<MockCommand>();
-      EXPECT_CALL(*m_mockCommand, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
-      EXPECT_CALL(*m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(false));
-      EXPECT_CALL(*m_mockCommand, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
-    }
 
-    
-    std::unique_ptr<MockCommand>&& GetMock() {
-      return std::move(m_mockCommand);
-    }
-    
-    void SetFinished(bool finished) {
-      EXPECT_CALL(*m_mockCommand, IsFinished()).WillRepeatedly(::testing::Return(finished));
-    }
-   private:
-    std::vector<Subsystem*> m_requirements;
-    std::unique_ptr<MockCommand> m_mockCommand;
-  };
+  CommandScheduler GetScheduler();
 
- protected:
+  virtual void SetUp();
 
-   CommandScheduler GetScheduler();
-
-   virtual void SetUp();
-
-   virtual void TearDown();
+  virtual void TearDown();
 };
 }
 }
