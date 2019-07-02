@@ -17,8 +17,8 @@ class ParallelCommandGroup : public CommandGroupBase {
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
-    if (!RequireUngrouped(commands)) {
-      return;
+    for (auto&& command : commands) {
+      if (!RequireUngrouped(*command)) return;
     }
     
     // TODO: Running Group

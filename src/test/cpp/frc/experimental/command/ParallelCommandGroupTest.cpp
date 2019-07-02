@@ -1,42 +1,43 @@
-// #include "CommandTestBase.h"
-// #include "frc/experimental/command/ParallelCommandGroup.h"
-// #include "frc/experimental/command/InstantCommand.h"
+#include "CommandTestBase.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
+#include "frc/experimental/command/InstantCommand.h"
 
-// using namespace frc::experimental;
+using namespace frc::experimental;
 
-// class ParallelCommandGroupTest : public CommandTestBase {
+class ParallelCommandGroupTest : public CommandTestBase {
 
-// };
+};
 
-// TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  TestSubsystem subsystem;
 
-//   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(&subsystem);
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(&subsystem);
 
-//   ParallelCommandGroup group({command1, command2});
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(1);
-//   EXPECT_CALL(*command1, End(false));
+  ParallelCommandGroup group({std::move(command1Holder), std::move(command2Holder)});
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute()).Times(2);
-//   EXPECT_CALL(*command2, End(false));
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(1);
+  EXPECT_CALL(*command1, End(false));
 
-//   scheduler.Schedule(&group);
+  EXPECT_CALL(*command2, Initialize());
+  EXPECT_CALL(*command2, Execute()).Times(2);
+  EXPECT_CALL(*command2, End(false));
 
-//   command1Holder.SetFinished(true);
-//   scheduler.Run();
-//   command2Holder.SetFinished(true);
-//   scheduler.Run();
+  scheduler.Schedule(&group);
 
-//   EXPECT_FALSE(scheduler.IsScheduled(&group));
-// }
+  command1->SetFinished(true);
+  scheduler.Run();
+  command2->SetFinished(true);
+  scheduler.Run();
+
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
 // TEST_F(ParallelCommandGroupTest, ParallelGroupInterruptTest){
 //   CommandScheduler scheduler = GetScheduler();
