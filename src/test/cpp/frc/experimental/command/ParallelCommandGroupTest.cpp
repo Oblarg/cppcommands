@@ -13,8 +13,8 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
 
   TestSubsystem subsystem;
 
-  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(&subsystem);
-  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(&subsystem);
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(wpi::ArrayRef<Subsystem*>{&subsystem});
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(wpi::ArrayRef<Subsystem*>{&subsystem});
 
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
