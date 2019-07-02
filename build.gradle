@@ -44,6 +44,12 @@ def includeSrcInIncludeRoot = false
 def includeDesktopSupport = true
 
 model {
+    binaries {
+    all {
+        if (targetPlatform.name == wpi.platforms.desktop)
+        cppCompiler.args << '/std:c++17' << '/permissive-'
+    }
+    }
     components {
         frcUserProgram(NativeExecutableSpec) {
             targetPlatform wpi.platforms.roborio
