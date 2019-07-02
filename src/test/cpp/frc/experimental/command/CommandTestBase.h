@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
+#include "frc/experimental/util/make_vector.h"
 #include "gmock/gmock.h"
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/command/CommandGroupBase.h"

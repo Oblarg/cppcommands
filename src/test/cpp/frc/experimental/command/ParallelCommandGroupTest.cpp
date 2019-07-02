@@ -19,12 +19,7 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
 
-  std::vector<std::unique_ptr<Command>> foo;
-
-  foo.emplace_back(std::move(command1Holder));
-  foo.emplace_back(std::move(command2Holder));
-
-  ParallelCommandGroup group(std::move(foo));
+  ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder)));
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(1);
