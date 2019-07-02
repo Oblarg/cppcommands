@@ -13,13 +13,18 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
 
   TestSubsystem subsystem;
 
-  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(wpi::ArrayRef<Subsystem*>{&subsystem});
-  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(wpi::ArrayRef<Subsystem*>{&subsystem});
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(&subsystem);
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(&subsystem);
 
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
 
-  ParallelCommandGroup group({std::move(command1Holder), std::move(command2Holder)});
+  std::vector<std::unique_ptr<Command>> foo;
+
+  foo.emplace_back(std::move(command1Holder));
+  foo.emplace_back(std::move(command2Holder));
+
+  ParallelCommandGroup group(std::move(foo));
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(1);
