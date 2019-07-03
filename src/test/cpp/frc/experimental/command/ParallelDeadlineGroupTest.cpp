@@ -1,12 +1,12 @@
-// #include "CommandTestBase.h"
-// #include "frc/experimental/command/ParallelDeadlineGroup.h"
-// #include "frc/experimental/command/InstantCommand.h"
+#include "CommandTestBase.h"
+#include "frc/experimental/command/ParallelDeadlineGroup.h"
+#include "frc/experimental/command/InstantCommand.h"
 
-// using namespace frc::experimental;
+using namespace frc::experimental;
 
-// class ParallelDeadlineGroupTest : public CommandTestBase {
+class ParallelDeadlineGroupTest : public CommandTestBase {
 
-// };
+};
 
 // TEST_F(ParallelDeadlineGroupTest, SequentialGroupScheduleTest){
 //   CommandScheduler scheduler = GetScheduler();
@@ -79,16 +79,10 @@
 //   EXPECT_FALSE(scheduler.IsScheduled(&group));
 // }
 
-// TEST_F(ParallelDeadlineGroupTest, SequentialGroupNotScheduledCancelTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelDeadlineGroupTest, SequentialGroupNotScheduledCancelTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  ParallelDeadlineGroup group{InstantCommand(), InstantCommand()};
 
-//   InstantCommand command1([]{}, {&subsystem});
-//   InstantCommand command2([]{}, {&subsystem});
-
-//   ParallelDeadlineGroup group(std::make_unique<Command>(command1), 
-//     {std::make_unique<Command>(command)});
-
-//   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
-// }
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+}

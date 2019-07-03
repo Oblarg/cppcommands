@@ -11,16 +11,13 @@ class ParallelCommandGroupTest : public CommandTestBase {
 TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
   CommandScheduler scheduler = GetScheduler();
 
-  TestSubsystem subsystem;
-
-  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>(&subsystem);
-  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>(&subsystem);
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
 
   MockCommand* command1 = command1Holder.get();
   MockCommand* command2 = command2Holder.get();
 
-  // ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder)));
-  ParallelCommandGroup group(std::move(command1Holder), std::move(command2Holder));
+  ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder)));
 
   EXPECT_CALL(*command1, Initialize());
   EXPECT_CALL(*command1, Execute()).Times(1);
@@ -40,48 +37,40 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupScheduleTest){
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-// TEST_F(ParallelCommandGroupTest, ParallelGroupInterruptTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelCommandGroupTest, ParallelGroupInterruptTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
 
-//   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
 
-//   ParallelCommandGroup group({command1, command2});
+  ParallelCommandGroup group(tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder)));
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(1);
-//   EXPECT_CALL(*command1, End(false));
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(1);
+  EXPECT_CALL(*command1, End(false));
 
+  EXPECT_CALL(*command2, Initialize());
+  EXPECT_CALL(*command2, Execute()).Times(2);
+  EXPECT_CALL(*command2, End(false)).Times(0);
+  EXPECT_CALL(*command2, End(true));
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute()).Times(2);
-//   EXPECT_CALL(*command2, End(false)).Times(0);
-//   EXPECT_CALL(*command2, End(true));
+  scheduler.Schedule(&group);
 
-//   scheduler.Schedule(&group);
+  command1->SetFinished(true);
+  scheduler.Run();
+  scheduler.Run();
+  scheduler.Cancel(&group);
 
-//   command1Holder.SetFinished(true);
-//   scheduler.Run();
-//   scheduler.Run();
-//   scheduler.Cancel(&group);
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-//   EXPECT_FALSE(scheduler.IsScheduled(&group));
-// }
+TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancelTest){
+  CommandScheduler scheduler = GetScheduler();
 
-// TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancelTest){
-//   CommandScheduler scheduler = GetScheduler();
+  ParallelCommandGroup group((InstantCommand(), InstantCommand()));
 
-//   TestSubsystem subsystem;
-
-//   InstantCommand command1([]{}, {&subsystem});
-//   InstantCommand command2([]{}, {&subsystem});
-
-//   ParallelCommandGroup group({std::make_unique<Command>(command1), 
-//     std::make_unique<Command>(command)});
-
-//   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
-// }
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+}

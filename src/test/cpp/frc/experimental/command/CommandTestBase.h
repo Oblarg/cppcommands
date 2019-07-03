@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gtest/gtest.h"
-#include "frc/experimental/util/make_vector.h"
+#include "make_vector.h"
 #include "gmock/gmock.h"
 #include "frc/experimental/command/CommandScheduler.h"
 #include "frc/experimental/command/CommandGroupBase.h"
@@ -33,6 +33,13 @@ class CommandTestBase : public ::testing::Test {
       MOCK_METHOD0(Initialize, void());
       MOCK_METHOD0(Execute, void());
       MOCK_METHOD1(End, void(bool interrupted));
+
+      MockCommand() {
+        m_requirements = {};
+        EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
+        EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(false));
+        EXPECT_CALL(*this, RunsWhenDisabled).WillRepeatedly(::testing::Return(true));
+      };
 
       MockCommand(wpi::ArrayRef<Subsystem*> requirements, bool finished = false, bool runWhenDisabled = true) {
         m_requirements = requirements;

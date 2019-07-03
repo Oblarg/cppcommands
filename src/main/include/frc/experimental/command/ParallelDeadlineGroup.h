@@ -16,6 +16,14 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
   }
 
+  template <class T, class... Types>
+  ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
+    SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
+  }
+
   ParallelDeadlineGroup(ParallelDeadlineGroup&& other) = default;
 
   //TODO: add copy constructor that makes deep copy?

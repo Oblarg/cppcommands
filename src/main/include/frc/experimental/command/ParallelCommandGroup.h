@@ -14,7 +14,7 @@ class ParallelCommandGroup : public CommandGroupBase {
   template <class... Types>
   ParallelCommandGroup(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::forward<Types>(commands)), ...);
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
     AddCommands(std::move(foo));
   }
 
