@@ -8,41 +8,41 @@ class ParallelDeadlineGroupTest : public CommandTestBase {
 
 };
 
-// TEST_F(ParallelDeadlineGroupTest, SequentialGroupScheduleTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelDeadlineGroupTest, DeadlineGroupScheduleTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
 
-//   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
-//   MockCommandHolder command3Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command3 = command3Holder.GetMock();
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
+  MockCommand* command3 = command3Holder.get();
 
-//   ParallelDeadlineGroup group(command1, {command2, command3});
+  ParallelDeadlineGroup group(std::move(command1Holder), 
+    tcb::make_vector<std::unique_ptr<Command>>(std::move(command2Holder), std::move(command3Holder)));
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(2);
-//   EXPECT_CALL(*command1, End(false));
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(2);
+  EXPECT_CALL(*command1, End(false));
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute()).Times(1);
-//   EXPECT_CALL(*command2, End(false));
+  EXPECT_CALL(*command2, Initialize());
+  EXPECT_CALL(*command2, Execute()).Times(1);
+  EXPECT_CALL(*command2, End(false));
 
-//   EXPECT_CALL(*command3, Initialize());
-//   EXPECT_CALL(*command3, Execute()).Times(2);
-//   EXPECT_CALL(*command3, End(true));
+  EXPECT_CALL(*command3, Initialize());
+  EXPECT_CALL(*command3, Execute()).Times(2);
+  EXPECT_CALL(*command3, End(true));
 
-//   scheduler.Schedule(&group);
+  scheduler.Schedule(&group);
 
-//   command2Holder.SetFinished(true);
-//   scheduler.Run();
-//   command1Holder.SetFinished(true);
-//   scheduler.Run();
+  command2->SetFinished(true);
+  scheduler.Run();
+  command1->SetFinished(true);
+  scheduler.Run();
 
-//   EXPECT_FALSE(scheduler.IsScheduled(&group));
-// }
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
 // TEST_F(ParallelDeadlineGroupTest, SequentialGroupInterruptTest){
 //   CommandScheduler scheduler = GetScheduler();
@@ -79,10 +79,10 @@ class ParallelDeadlineGroupTest : public CommandTestBase {
 //   EXPECT_FALSE(scheduler.IsScheduled(&group));
 // }
 
-TEST_F(ParallelDeadlineGroupTest, SequentialGroupNotScheduledCancelTest){
-  CommandScheduler scheduler = GetScheduler();
+// TEST_F(ParallelDeadlineGroupTest, DeadlineGroupNotScheduledCancelTest){
+//   CommandScheduler scheduler = GetScheduler();
 
-  ParallelDeadlineGroup group{InstantCommand(), InstantCommand()};
+//   ParallelDeadlineGroup group{InstantCommand(), InstantCommand()};
 
-  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
-}
+//   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+// }

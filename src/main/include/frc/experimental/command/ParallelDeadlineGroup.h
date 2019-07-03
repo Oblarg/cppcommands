@@ -7,22 +7,18 @@ namespace frc {
 namespace experimental {
 class ParallelDeadlineGroup : public CommandGroupBase {
  public:
-  ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) 
-      : m_deadline{deadline.get()} {
+  ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) {
+    SetDeadline(std::move(deadline));
     AddCommands(std::move(commands));
-    m_deadline->SetGrouped(true);
-    m_commands[std::move(deadline)] = false;
-    AddRequirements(m_deadline->GetRequirements());
-    m_runWhenDisabled &= m_deadline->RunsWhenDisabled();
   }
 
-  template <class T, class... Types>
-  ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
-    SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
-    std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
-    AddCommands(std::move(foo));
-  }
+  // template <class T, class... Types>
+  // ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
+  //   SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
+  //   std::vector<std::unique_ptr<Command>> foo;
+  //   ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+  //   AddCommands(std::move(foo));
+  // }
 
   ParallelDeadlineGroup(ParallelDeadlineGroup&& other) = default;
 
@@ -68,7 +64,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
         commandRunning.first->End(false);
         commandRunning.second = false;
       }
-    }
+    };
   }
   
   void End(bool interrupted) override {
