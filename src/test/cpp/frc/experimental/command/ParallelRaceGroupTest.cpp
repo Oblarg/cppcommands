@@ -1,92 +1,87 @@
-// #include "CommandTestBase.h"
-// #include "frc/experimental/command/ParallelRaceGroup.h"
-// #include "frc/experimental/command/InstantCommand.h"
+#include "CommandTestBase.h"
+#include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/InstantCommand.h"
 
-// using namespace frc::experimental;
+using namespace frc::experimental;
 
-// class ParallelRaceGroupTest : public CommandTestBase {
+class ParallelRaceGroupTest : public CommandTestBase {
 
-// };
+};
 
-// TEST_F(ParallelRaceGroupTest, SequentialGroupScheduleTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelRaceGroupTest, SequentialGroupScheduleTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
 
-//   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
-//   MockCommandHolder command3Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command3 = command3Holder.GetMock();
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
+  MockCommand* command3 = command3Holder.get();
 
-//   ParallelRaceGroup group({command1, command2, command3});
+  ParallelRaceGroup group{
+    tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder), std::move(command3Holder))};
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(2);
-//   EXPECT_CALL(*command1, End(true));
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(2);
+  EXPECT_CALL(*command1, End(true));
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute()).Times(2);
-//   EXPECT_CALL(*command2, End(false));
+  EXPECT_CALL(*command2, Initialize());
+  EXPECT_CALL(*command2, Execute()).Times(2);
+  EXPECT_CALL(*command2, End(false));
 
-//   EXPECT_CALL(*command3, Initialize());
-//   EXPECT_CALL(*command3, Execute()).Times(2);
-//   EXPECT_CALL(*command3, End(true));
+  EXPECT_CALL(*command3, Initialize());
+  EXPECT_CALL(*command3, Execute()).Times(2);
+  EXPECT_CALL(*command3, End(true));
 
-//   scheduler.Schedule(&group);
+  scheduler.Schedule(&group);
 
-//   scheduler.Run();
-//   command2Holder.SetFinished(true);
-//   scheduler.Run();
+  scheduler.Run();
+  command2->SetFinished(true);
+  scheduler.Run();
 
-//   EXPECT_FALSE(scheduler.IsScheduled(&group));
-// }
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(ParallelRaceGroupTest, SequentialGroupInterruptTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelRaceGroupTest, SequentialGroupInterruptTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command2Holder = std::make_unique<MockCommand>();
+  std::unique_ptr<MockCommand> command3Holder = std::make_unique<MockCommand>();
 
-//   MockCommandHolder command1Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
-//   MockCommandHolder command3Holder{true, {&subsystem}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command3 = command3Holder.GetMock();
+  MockCommand* command1 = command1Holder.get();
+  MockCommand* command2 = command2Holder.get();
+  MockCommand* command3 = command3Holder.get();
 
-//   ParallelRaceGroup group({command1, command2, command3});
+  ParallelRaceGroup group{
+    tcb::make_vector<std::unique_ptr<Command>>(std::move(command1Holder), std::move(command2Holder), std::move(command3Holder))};
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(1);
-//   EXPECT_CALL(*command1, End(true));
+  EXPECT_CALL(*command1, Initialize());
+  EXPECT_CALL(*command1, Execute()).Times(1);
+  EXPECT_CALL(*command1, End(true));
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute()).Times(1);
-//   EXPECT_CALL(*command2, End(true));
+  EXPECT_CALL(*command2, Initialize());
+  EXPECT_CALL(*command2, Execute()).Times(1);
+  EXPECT_CALL(*command2, End(true));
 
-//   EXPECT_CALL(*command3, Initialize());
-//   EXPECT_CALL(*command3, Execute()).Times(1);
-//   EXPECT_CALL(*command3, End(true));
+  EXPECT_CALL(*command3, Initialize());
+  EXPECT_CALL(*command3, Execute()).Times(1);
+  EXPECT_CALL(*command3, End(true));
 
-//   scheduler.Schedule(&group);
+  scheduler.Schedule(&group);
 
-//   scheduler.Run();
-//   scheduler.Cancel(&group);
-//   scheduler.Run();
+  scheduler.Run();
+  scheduler.Cancel(&group);
+  scheduler.Run();
 
-//   EXPECT_FALSE(scheduler.IsScheduled(&group));
-// }
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(ParallelRaceGroupTest, SequentialGroupNotScheduledCancelTest){
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(ParallelRaceGroupTest, SequentialGroupNotScheduledCancelTest){
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem subsystem;
+  ParallelRaceGroup group{InstantCommand(), InstantCommand()};
 
-//   InstantCommand command1([]{}, {&subsystem});
-//   InstantCommand command2([]{}, {&subsystem});
-
-//   ParallelRaceGroup group({std::make_unique<Command>(command1), std::make_unique<Command>(command2)});
-
-//   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
-// }
+  EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+}

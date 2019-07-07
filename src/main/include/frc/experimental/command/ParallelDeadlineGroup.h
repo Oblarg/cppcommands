@@ -13,7 +13,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   }
 
   template <class T, class... Types,
-   typename = std::enable_if_t<std::is_assignable<Command, T>::value>>
+   typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
   ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
     SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
     std::vector<std::unique_ptr<Command>> foo;

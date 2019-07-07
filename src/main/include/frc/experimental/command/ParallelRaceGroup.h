@@ -11,6 +11,13 @@ class ParallelRaceGroup : public CommandGroupBase {
     AddCommands(std::move(commands));
   }
 
+  template <class... Types>
+  ParallelRaceGroup(Types&&... commands) {
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
+  }
+
   ParallelRaceGroup(ParallelRaceGroup&& other) = default;
 
   //TODO: add copy constructor that makes deep copy?
