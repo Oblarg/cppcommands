@@ -12,13 +12,14 @@ class ParallelDeadlineGroup : public CommandGroupBase {
     AddCommands(std::move(commands));
   }
 
-  // template <class T, class... Types>
-  // ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
-  //   SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
-  //   std::vector<std::unique_ptr<Command>> foo;
-  //   ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
-  //   AddCommands(std::move(foo));
-  // }
+  template <class T, class... Types,
+   typename = std::enable_if_t<std::is_assignable<Command, T>::value>>
+  ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
+    SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
+  }
 
   ParallelDeadlineGroup(ParallelDeadlineGroup&& other) = default;
 
