@@ -12,11 +12,11 @@ template <typename Key>
 class SelectCommand : public SendableCommandBase {
  public:
   template <class... Types>
-  SelectCommand(std::pair<Key, Types&&>... commands, std::function<Key()> selector) 
+  SelectCommand(std::function<Key()> selector, std::pair<Key, Types>... commands) 
     : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 
-    ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::forward<Types>(commands.second))), ...);
+    ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::move(commands.second))), ...);
 
     for(auto&& command : foo) {
       if (!CommandGroupBase::RequireUngrouped(command.second)) {
