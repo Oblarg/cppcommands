@@ -13,27 +13,21 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
     AddCommands(std::move(commands));
   }
 
+  template <class... Types>
+  SequentialCommandGroup(Types&&... commands) {
+    AddCommands(std::forward<Types>(commands)...);
+  }
+
   SequentialCommandGroup(SequentialCommandGroup&& other) = default;
   
   //TODO: add copy constructor that makes deep copy?
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
- 
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final {
-    if (!RequireUngrouped(commands)) {
-      return;
-    }
-    
-    if (m_currentCommandIndex != -1) {
-      wpi_setWPIErrorWithContext(CommandIllegalUse, 
-          "Commands cannot be added to a CommandGroup while the group is running");
-    }
-        
-    for(auto&& command : commands) {
-      command->SetGrouped(true);
-      AddRequirements(command->GetRequirements());
-      m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands.emplace_back(std::move(command));
-    }
+
+  template <class... Types>
+  void AddCommands(Types&&... commands) {
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
   }
   
   void Initialize() override {
@@ -78,6 +72,24 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
     return std::make_unique<SequentialCommandGroup>(std::move(*this));
   } 
  private:
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final {
+    if (!RequireUngrouped(commands)) {
+      return;
+    }
+    
+    if (m_currentCommandIndex != -1) {
+      wpi_setWPIErrorWithContext(CommandIllegalUse, 
+          "Commands cannot be added to a CommandGroup while the group is running");
+    }
+        
+    for(auto&& command : commands) {
+      command->SetGrouped(true);
+      AddRequirements(command->GetRequirements());
+      m_runWhenDisabled &= command->RunsWhenDisabled();
+      m_commands.emplace_back(std::move(command));
+    }
+  }
+
   wpi::SmallVector<std::unique_ptr<Command>, 4> m_commands;
   int m_currentCommandIndex{-1};
   bool m_runWhenDisabled{true};

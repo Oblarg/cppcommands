@@ -13,9 +13,7 @@ class ParallelRaceGroup : public CommandGroupBase {
 
   template <class... Types>
   ParallelRaceGroup(Types&&... commands) {
-    std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
-    AddCommands(std::move(foo));
+    AddCommands(std::forward<Types>(commands)...);
   }
 
   ParallelRaceGroup(ParallelRaceGroup&& other) = default;
@@ -23,6 +21,33 @@ class ParallelRaceGroup : public CommandGroupBase {
   //TODO: add copy constructor that makes deep copy?
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
   
+  template <class... Types>
+  void AddCommands(Types&&... commands) {
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
+  }
+  
+  void End(bool interrupted) override {
+    for (auto& commandRunning : m_commands) {
+      if (!commandRunning->IsFinished()) {
+        commandRunning->End(true);
+      }
+    }
+  }
+  
+  bool IsFinished() override {
+    return m_finished;
+  }
+  
+  bool RunsWhenDisabled() const override {
+    return m_runWhenDisabled;
+  }
+ protected:
+  std::unique_ptr<Command> TransferOwnership()&& override {
+    return std::make_unique<ParallelRaceGroup>(std::move(*this));
+  } 
+ private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {
       return;
@@ -54,27 +79,7 @@ class ParallelRaceGroup : public CommandGroupBase {
       }
     }
   }
-  
-  void End(bool interrupted) override {
-    for (auto& commandRunning : m_commands) {
-      if (!commandRunning->IsFinished()) {
-        commandRunning->End(true);
-      }
-    }
-  }
-  
-  bool IsFinished() override {
-    return m_finished;
-  }
-  
-  bool RunsWhenDisabled() const override {
-    return m_runWhenDisabled;
-  }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ParallelRaceGroup>(std::move(*this));
-  } 
- private:
+
   std::set<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
   bool m_finished{false};

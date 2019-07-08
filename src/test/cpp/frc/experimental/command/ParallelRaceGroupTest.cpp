@@ -8,7 +8,7 @@ class ParallelRaceGroupTest : public CommandTestBase {
 
 };
 
-TEST_F(ParallelRaceGroupTest, SequentialGroupScheduleTest){
+TEST_F(ParallelRaceGroupTest, ParallelRaceScheduleTest){
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -43,7 +43,7 @@ TEST_F(ParallelRaceGroupTest, SequentialGroupScheduleTest){
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, SequentialGroupInterruptTest){
+TEST_F(ParallelRaceGroupTest, ParallelRaceInterruptTest){
   CommandScheduler scheduler = GetScheduler();
 
   std::unique_ptr<MockCommand> command1Holder = std::make_unique<MockCommand>();
@@ -78,7 +78,7 @@ TEST_F(ParallelRaceGroupTest, SequentialGroupInterruptTest){
   EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
 
-TEST_F(ParallelRaceGroupTest, SequentialGroupNotScheduledCancelTest){
+TEST_F(ParallelRaceGroupTest, ParallelRaceNotScheduledCancelTest){
   CommandScheduler scheduler = GetScheduler();
 
   ParallelRaceGroup group{InstantCommand(), InstantCommand()};

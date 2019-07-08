@@ -1,208 +1,200 @@
-// #include "frc/experimental/command/CommandScheduler.h"
-// #include "frc/experimental/buttons/InternalButton.h"
-// #include "CommandTestBase.h"
-// #include "frc/experimental/command/InstantCommand.h"
-// #include "frc/experimental/command/ParallelCommandGroup.h"
-// #include "frc/experimental/command/ParallelRaceGroup.h"
-// #include "frc/experimental/command/ParallelDeadlineGroup.h"
-// #include "frc/experimental/command/ConditionalCommand.h"
-// #include "frc/experimental/command/SelectCommand.h"
-// #include "frc/experimental/command/SequentialCommandGroup.h"
+#include "frc/experimental/command/CommandScheduler.h"
+#include "frc/experimental/buttons/InternalButton.h"
+#include "CommandTestBase.h"
+#include "frc/experimental/command/InstantCommand.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
+#include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/ParallelDeadlineGroup.h"
+#include "frc/experimental/command/ConditionalCommand.h"
+#include "frc/experimental/command/SelectCommand.h"
+#include "frc/experimental/command/SequentialCommandGroup.h"
 
-// using namespace frc::experimental;
+using namespace frc::experimental;
 
-// class CommandRequirementsTest : public CommandTestBase {
+class CommandRequirementsTest : public CommandTestBase {
   
-// };
+};
 
-// TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, RequirementInterruptTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement;
+  TestSubsystem requirement;
 
-//   MockCommandHolder command1Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
+  MockCommand command1(&requirement);
+  MockCommand command2(&requirement);
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute());
-//   EXPECT_CALL(*command1, End(true));
-//   EXPECT_CALL(*command1, End(false)).Times(0);
+  EXPECT_CALL(command1, Initialize());
+  EXPECT_CALL(command1, Execute());
+  EXPECT_CALL(command1, End(true));
+  EXPECT_CALL(command1, End(false)).Times(0);
 
-//   EXPECT_CALL(*command2, Initialize());
-//   EXPECT_CALL(*command2, Execute());
-//   EXPECT_CALL(*command2, End(true)).Times(0);
-//   EXPECT_CALL(*command2, End(false)).Times(0);
+  EXPECT_CALL(command2, Initialize());
+  EXPECT_CALL(command2, Execute());
+  EXPECT_CALL(command2, End(true)).Times(0);
+  EXPECT_CALL(command2, End(false)).Times(0);
 
-//   scheduler.Schedule(command1);
-//   scheduler.Run();
-//   EXPECT_TRUE(scheduler.IsScheduled(command1));
-//   scheduler.Schedule(command2);
-//   EXPECT_FALSE(scheduler.IsScheduled(command1));
-//   EXPECT_TRUE(scheduler.IsScheduled(command2));
-//   scheduler.Run();
-// }
+  scheduler.Schedule(&command1);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  scheduler.Schedule(&command2);
+  EXPECT_FALSE(scheduler.IsScheduled(&command1));
+  EXPECT_TRUE(scheduler.IsScheduled(&command2));
+  scheduler.Run();
+}
 
-// TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, RequirementUninterruptibleTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement;
+  TestSubsystem requirement;
 
-//   MockCommandHolder command1Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command1 = command1Holder.GetMock();
-//   MockCommandHolder command2Holder{true, {&requirement}};
-//   std::unique_ptr<MockCommandHolder::MockCommand>& command2 = command2Holder.GetMock();
+  MockCommand command1(&requirement);
+  MockCommand command2(&requirement);
 
-//   EXPECT_CALL(*command1, Initialize());
-//   EXPECT_CALL(*command1, Execute()).Times(2);
-//   EXPECT_CALL(*command1, End(true)).Times(0);
-//   EXPECT_CALL(*command1, End(false)).Times(0);
+  EXPECT_CALL(command1, Initialize());
+  EXPECT_CALL(command1, Execute()).Times(2);
+  EXPECT_CALL(command1, End(true)).Times(0);
+  EXPECT_CALL(command1, End(false)).Times(0);
 
-//   EXPECT_CALL(*command2, Initialize()).Times(0);
-//   EXPECT_CALL(*command2, Execute()).Times(0);
-//   EXPECT_CALL(*command2, End(true)).Times(0);
-//   EXPECT_CALL(*command2, End(false)).Times(0);
+  EXPECT_CALL(command2, Initialize()).Times(0);
+  EXPECT_CALL(command2, Execute()).Times(0);
+  EXPECT_CALL(command2, End(true)).Times(0);
+  EXPECT_CALL(command2, End(false)).Times(0);
 
-//   scheduler.Schedule(false, command1);
-//   scheduler.Run();
-//   EXPECT_TRUE(scheduler.IsScheduled(command1));
-//   scheduler.Schedule(command2);
-//   EXPECT_TRUE(scheduler.IsScheduled(command1));
-//   EXPECT_FALSE(scheduler.IsScheduled(command2));
-//   scheduler.Run();
-// }
+  scheduler.Schedule(false, &command1);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  scheduler.Schedule(&command2);
+  EXPECT_TRUE(scheduler.IsScheduled(&command1));
+  EXPECT_FALSE(scheduler.IsScheduled(&command2));
+  scheduler.Run();
+}
 
-// TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, ParallelGroupRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* group = new ParallelCommandGroup({command1, command2});
+  ParallelCommandGroup group(std::move(command1), std::move(command2));
 
-//   scheduler.Schedule(group);
-//   scheduler.Schedule(command3);
+  scheduler.Schedule(&group);
+  scheduler.Schedule(&command3);
 
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(group));
-// }
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(CommandRequirementsTest, SequentialGroupRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, SequentialGroupRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* group = new SequentialCommandGroup({command1, command2});
+  SequentialCommandGroup group(std::move(command1), std::move(command2));
 
-//   scheduler.Schedule(group);
-//   scheduler.Schedule(command3);
+  scheduler.Schedule(&group);
+  scheduler.Schedule(&command3);
 
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(group));
-// }
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(CommandRequirementsTest, RaceGroupRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, RaceGroupRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* group = new ParallelRaceGroup({command1, command2});
+  ParallelRaceGroup group(std::move(command1), std::move(command2));
 
-//   scheduler.Schedule(group);
-//   scheduler.Schedule(command3);
+  scheduler.Schedule(&group);
+  scheduler.Schedule(&command3);
 
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(group));
-// }
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(CommandRequirementsTest, ParallelDeadlineRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, ParallelDeadlineRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* group = new ParallelDeadlineGroup(std::make_unique<Command>(command1), 
-//     {std::make_unique<Command>(command2)});
+  ParallelDeadlineGroup group(std::move(command1), std::move(command2));
 
-//   scheduler.Schedule(group);
-//   scheduler.Schedule(command3);
+  scheduler.Schedule(&group);
+  scheduler.Schedule(&command3);
 
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(group));
-// }
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
+}
 
-// TEST_F(CommandRequirementsTest, ConditionalCommandRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+TEST_F(CommandRequirementsTest, ConditionalCommandRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* conditional = new ConditionalCommand(
-//     std::make_unique<Command>(command1), 
-//     std::make_unique<Command>(command2), []{return true;});
+  ConditionalCommand conditional(std::move(command1), std::move(command2), []{return true;});
+  scheduler.Schedule(&conditional);
+  scheduler.Schedule(&command3);
 
-//   scheduler.Schedule(conditional);
-//   scheduler.Schedule(command3);
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&conditional));
+}
 
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(conditional));
-// }
+TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
+  CommandScheduler scheduler = GetScheduler();
 
-// TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
-//   CommandScheduler scheduler = GetScheduler();
+  TestSubsystem requirement1;
+  TestSubsystem requirement2;
+  TestSubsystem requirement3;
+  TestSubsystem requirement4;
 
-//   TestSubsystem requirement1;
-//   TestSubsystem requirement2;
-//   TestSubsystem requirement3;
-//   TestSubsystem requirement4;
+  InstantCommand command1([]{},{&requirement1, &requirement2});
+  InstantCommand command2([]{},{&requirement3});
+  InstantCommand command3([]{},{&requirement3, &requirement4});
 
-//   Command* command1 = new InstantCommand([]{},{&requirement1, &requirement2});
-//   Command* command2 = new InstantCommand([]{},{&requirement3});
-//   Command* command3 = new InstantCommand([]{},{&requirement3, &requirement4});
+  SelectCommand<int> select(
+    {{1, std::move(command1)}, 
+    {2, std::move(command2)}}, []{return 1;});
 
-//   Command* select = new SelectCommand<int>(
-//     {{1, std::make_unique<Command>(command1)}, 
-//     {2, std::make_unique<Command>(command2)}}, []{return 1;});
+  scheduler.Schedule(&select);
+  scheduler.Schedule(&command3);
 
-//   scheduler.Schedule(select);
-//   scheduler.Schedule(command3);
-
-//   EXPECT_TRUE(scheduler.IsScheduled({command3}));
-//   EXPECT_FALSE(scheduler.IsScheduled(select));
-// }
+  EXPECT_TRUE(scheduler.IsScheduled(&command3));
+  EXPECT_FALSE(scheduler.IsScheduled(&select));
+}
 
 // // TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
 // //   TestSubsystem requirement1;

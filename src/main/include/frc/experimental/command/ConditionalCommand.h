@@ -2,26 +2,17 @@
 
 #include "SendableCommandBase.h"
 #include "CommandGroupBase.h"
+#include <iostream>
 
 namespace frc {
 namespace experimental {
 class ConditionalCommand : public SendableCommandBase {
  public:
-  ConditionalCommand(std::unique_ptr<Command>&& onTrue, std::unique_ptr<Command>&& onFalse, std::function<bool()> condition)
-    : m_condition{std::move(condition)} {
-      if (!CommandGroupBase::RequireUngrouped({onTrue.get(), onFalse.get()})) {
-        return;
-      }
-
-      m_onTrue = std::move(onTrue);
-      m_onFalse = std::move(onFalse);
-
-      m_onTrue->SetGrouped(true);
-      m_onFalse->SetGrouped(true);
-      
-      AddRequirements(onTrue->GetRequirements());
-      AddRequirements(onFalse->GetRequirements());
-    }
+  template <class T, typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
+  ConditionalCommand(T&& onTrue, T&& onFalse, std::function<bool()> condition)
+    : ConditionalCommand(std::make_unique<T>(std::forward<T>(onTrue)),
+      std::make_unique<T>(std::forward<T>(onFalse)),
+      condition) {}
 
     ConditionalCommand(ConditionalCommand&& other) = default;
 
@@ -62,6 +53,21 @@ class ConditionalCommand : public SendableCommandBase {
     return std::make_unique<ConditionalCommand>(std::move(*this));
   }
  private:
+  ConditionalCommand(std::unique_ptr<Command>&& onTrue, std::unique_ptr<Command>&& onFalse, std::function<bool()> condition)
+    : m_condition{std::move(condition)} {
+      if (!CommandGroupBase::RequireUngrouped({onTrue.get(), onFalse.get()})) {
+        return;
+      }
+
+      m_onTrue = std::move(onTrue);
+      m_onFalse = std::move(onFalse);
+
+      m_onTrue->SetGrouped(true);
+      m_onFalse->SetGrouped(true);
+
+      AddRequirements(m_onTrue->GetRequirements());
+      AddRequirements(m_onFalse->GetRequirements());
+  }
   std::unique_ptr<Command> m_onTrue;
   std::unique_ptr<Command> m_onFalse;
   std::function<bool()> m_condition;

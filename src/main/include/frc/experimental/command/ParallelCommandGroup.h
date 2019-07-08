@@ -13,9 +13,7 @@ class ParallelCommandGroup : public CommandGroupBase {
 
   template <class... Types>
   ParallelCommandGroup(Types&&... commands) {
-    std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
-    AddCommands(std::move(foo));
+    AddCommands(std::forward<Types>(commands)...);
   }
 
   ParallelCommandGroup(ParallelCommandGroup&& other) = default;
@@ -23,20 +21,11 @@ class ParallelCommandGroup : public CommandGroupBase {
   //TODO: add copy constructor that makes a deep copy?
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
-  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
-    for (auto&& command : commands) {
-      if (!RequireUngrouped(*command)) return;
-    }
-    
-    // TODO: Running Group
-    
-    // TODO: Disjoint
-    for(auto&& command : commands) {
-      command->SetGrouped(true);
-      AddRequirements(command->GetRequirements());
-      m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands[std::move(command)] = false;
-    }
+  template <class... Types>
+  void AddCommands(Types&&... commands) {
+    std::vector<std::unique_ptr<Command>> foo;
+    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    AddCommands(std::move(foo));
   }
   
   void Initialize() override {
@@ -82,6 +71,22 @@ class ParallelCommandGroup : public CommandGroupBase {
     return std::make_unique<ParallelCommandGroup>(std::move(*this));
   } 
  private:
+  void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
+    for (auto&& command : commands) {
+      if (!RequireUngrouped(*command)) return;
+    }
+    
+    // TODO: Running Group
+    
+    // TODO: Disjoint
+    for(auto&& command : commands) {
+      command->SetGrouped(true);
+      AddRequirements(command->GetRequirements());
+      m_runWhenDisabled &= command->RunsWhenDisabled();
+      m_commands[std::move(command)] = false;
+    }
+  }
+
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   bool m_runWhenDisabled{true};
 };
