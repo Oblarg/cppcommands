@@ -186,8 +186,8 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   InstantCommand command3([]{},{&requirement3, &requirement4});
 
   SelectCommand<int> select(
-    {{1, std::move(command1)}, 
-    {2, std::move(command2)}}, []{return 1;});
+    std::pair<int, InstantCommand>{1, std::move(command1)}, 
+    std::pair<int, InstantCommand>{2, std::move(command2)}, []{return 1;});
 
   scheduler.Schedule(&select);
   scheduler.Schedule(&command3);

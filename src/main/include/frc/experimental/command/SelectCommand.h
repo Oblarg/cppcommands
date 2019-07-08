@@ -12,18 +12,21 @@ namespace experimental {
 template <typename Key>
 class SelectCommand : public SendableCommandBase {
  public:
-  template <class T, typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
-  SelectCommand(std::vector<std::pair<Key, T&&>> commands, std::function<Key()> selector) 
+  template <class... Types>
+  SelectCommand(std::pair<Key, Types&&>... commands, std::function<Key()> selector) 
     : m_selector{std::move(selector)} {
-    for (auto&& command : commands) {
+    std::vector<std::pair<Key, std::unique_vector<Command>> foo;
+    ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::forward<Types>(commands.second))), ...);
+
+    for(auto&& command : foo) {
       if (!CommandGroupBase::RequireUngrouped(command.second)) {
         return;
       }
     }
 
-    for (auto&& command : commands) {
+    for (auto&& command : foo) {
       AddRequirements(command.second->GetRequirements());
-      m_commands.emplace(std::move(command.first), std::make_unique<T>(std::forward<T>(command.second)));
+      m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
 
