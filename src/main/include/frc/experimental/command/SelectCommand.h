@@ -14,7 +14,7 @@ class SelectCommand : public SendableCommandBase {
   template <class... Types>
   SelectCommand(std::pair<Key, Types&&>... commands, std::function<Key()> selector) 
     : m_selector{std::move(selector)} {
-    std::vector<std::pair<Key, std::unique_ptr<Command>> foo;
+    std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 
     ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::forward<Types>(commands.second))), ...);
 
