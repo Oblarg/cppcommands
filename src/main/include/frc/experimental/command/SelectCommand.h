@@ -1,6 +1,5 @@
 #pragma once
 
-#include <initializer_list>
 #include <unordered_map>
 
 #include "SendableCommandBase.h"
@@ -15,7 +14,8 @@ class SelectCommand : public SendableCommandBase {
   template <class... Types>
   SelectCommand(std::pair<Key, Types&&>... commands, std::function<Key()> selector) 
     : m_selector{std::move(selector)} {
-    std::vector<std::pair<Key, std::unique_vector<Command>> foo;
+    std::vector<std::pair<Key, std::unique_ptr<Command>> foo;
+
     ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::forward<Types>(commands.second))), ...);
 
     for(auto&& command : foo) {
