@@ -8,10 +8,12 @@ namespace frc {
 namespace experimental {
 class ConditionalCommand : public SendableCommandBase {
  public:
-  template <class T, typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
-  ConditionalCommand(T&& onTrue, T&& onFalse, std::function<bool()> condition)
-    : ConditionalCommand(std::make_unique<T>(std::forward<T>(onTrue)),
-      std::make_unique<T>(std::forward<T>(onFalse)),
+  template <class T1, class T2, 
+    typename = std::enable_if_t<std::is_base_of<Command, T1>::value>,
+    typename = std::enable_if_t<std::is_base_of<Command, T2>::value>>
+  ConditionalCommand(T1&& onTrue, T2&& onFalse, std::function<bool()> condition)
+    : ConditionalCommand(std::make_unique<T1>(std::forward<T1>(onTrue)),
+      std::make_unique<T2>(std::forward<T2>(onFalse)),
       condition) {}
 
     ConditionalCommand(ConditionalCommand&& other) = default;

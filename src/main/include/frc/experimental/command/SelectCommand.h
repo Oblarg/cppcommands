@@ -30,20 +30,19 @@ class SelectCommand : public SendableCommandBase {
     }
   }
 
+  SelectCommand(std::function<Key()> selector, std::initializer_list<std::pair<Key, std::unique_ptr<Command>>>&& commands) 
+    : m_selector{std::move(selector)} {
+    for (auto&& command : commands) {
+      if (!CommandGroupBase::RequireUngrouped(command.second)) {
+        return;
+      }
+    }
 
-  // SelectCommand(std::initializer_list<std::pair<Key, std::unique_ptr<Command>>>&& commands, std::function<Key()> selector) 
-  //   : m_selector{std::move(selector)} {
-  //   for (auto&& command : commands) {
-  //     if (!CommandGroupBase::RequireUngrouped(command.second)) {
-  //       return;
-  //     }
-  //   }
-
-  //   for (auto&& command : commands) {
-  //     AddRequirements(command.second->GetRequirements());
-  //     m_commands.emplace(std::move(command.first), std::move(command.second));
-  //   }
-  // }
+    for (auto&& command : commands) {
+      AddRequirements(command.second->GetRequirements());
+      m_commands.emplace(std::move(command.first), std::move(command.second));
+    }
+  }
   
   explicit SelectCommand(std::function<Command*()> toRun) 
     : m_toRun{toRun} {
