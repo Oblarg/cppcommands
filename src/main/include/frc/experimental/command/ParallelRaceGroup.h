@@ -1,17 +1,18 @@
 #pragma once
 
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <unordered_map>
 
 namespace frc {
 namespace experimental {
-class ParallelRaceGroup : public CommandGroupBase {
+class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGroup> {
  public:
   ParallelRaceGroup(std::vector<std::unique_ptr<Command>>&& commands) {
     AddCommands(std::move(commands));
   }
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   ParallelRaceGroup(Types&&... commands) {
     AddCommands(std::forward<Types>(commands)...);
   }
@@ -43,10 +44,6 @@ class ParallelRaceGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ParallelRaceGroup>(std::move(*this));
-  } 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {

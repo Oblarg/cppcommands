@@ -1,11 +1,12 @@
 #pragma once
 
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <unordered_map>
 
 namespace frc {
 namespace experimental {
-class ParallelDeadlineGroup : public CommandGroupBase {
+class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
  public:
   ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) {
     SetDeadline(std::move(deadline));
@@ -13,7 +14,8 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   }
 
   template <class T, class... Types,
-    typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
+    typename = std::enable_if_t<std::is_base_of<Command, T>::value>,
+    typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
     SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
     AddCommands(std::forward<Types>(commands)...);
@@ -24,7 +26,7 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   //TODO: add copy constructor that makes deep copy?
   ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
@@ -64,10 +66,6 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ParallelDeadlineGroup>(std::move(*this));
-  } 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {

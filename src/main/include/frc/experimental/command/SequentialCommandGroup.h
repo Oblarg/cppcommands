@@ -1,19 +1,20 @@
 #pragma once
 
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <wpi/ArrayRef.h>
 #include "frc/WPIErrors.h"
 #include "frc/ErrorBase.h"
 
 namespace frc {
 namespace experimental {
-class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
+class SequentialCommandGroup : public CommandHelper<CommandGroupBase, SequentialCommandGroup>, public ErrorBase {
  public:
   SequentialCommandGroup(std::vector<std::unique_ptr<Command>>&& commands) {
     AddCommands(std::move(commands));
   }
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   SequentialCommandGroup(Types&&... commands) {
     AddCommands(std::forward<Types>(commands)...);
   }
@@ -23,7 +24,7 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
   //TODO: add copy constructor that makes deep copy?
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
@@ -67,10 +68,6 @@ class SequentialCommandGroup : public CommandGroupBase, public ErrorBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<SequentialCommandGroup>(std::move(*this));
-  } 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) final {
     if (!RequireUngrouped(commands)) {

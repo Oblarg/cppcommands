@@ -2,10 +2,11 @@
 
 #include "SendableCommandBase.h"
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 
 namespace frc {
 namespace experimental {
-class PerpetualCommand : public SendableCommandBase {
+class PerpetualCommand : public CommandHelper<SendableCommandBase, PerpetualCommand> {
  public:
   explicit PerpetualCommand(std::unique_ptr<Command> command) {
       if (!CommandGroupBase::RequireUngrouped(command)) { 

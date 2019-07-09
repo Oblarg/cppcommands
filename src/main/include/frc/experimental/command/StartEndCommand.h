@@ -1,10 +1,11 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc {
 namespace experimental {
-class StartEndCommand : public SendableCommandBase {
+class StartEndCommand : public CommandHelper<SendableCommandBase, StartEndCommand> {
  public:
   StartEndCommand(std::function<void()> onInit, std::function<void()> onEnd, wpi::ArrayRef<Subsystem*> requirements) 
     : m_onInit{std::move(onInit)}, m_onEnd{std::move(onEnd)} {
@@ -21,10 +22,6 @@ class StartEndCommand : public SendableCommandBase {
     m_onEnd();
   }
  protected:
-  protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<StartEndCommand>(std::move(*this));
-  }
   std::function<void()> m_onInit;
   std::function<void()> m_onEnd;
 };
