@@ -1,11 +1,12 @@
 #pragma once
 
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <unordered_map>
 
 namespace frc {
 namespace experimental {
-class ParallelDeadlineGroup : public CommandGroupBase {
+class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDeadlineGroup> {
  public:
   ParallelDeadlineGroup(std::unique_ptr<Command>&& deadline, std::vector<std::unique_ptr<Command>>&& commands) {
     SetDeadline(std::move(deadline));
@@ -64,10 +65,6 @@ class ParallelDeadlineGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ParallelDeadlineGroup>(std::move(*this));
-  } 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     if (!RequireUngrouped(commands)) {

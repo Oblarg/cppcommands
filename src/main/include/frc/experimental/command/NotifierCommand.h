@@ -1,11 +1,12 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandHelper.h"
 #include <frc/Notifier.h>
 
 namespace frc {
 namespace experimental {
-class NotifierCommand : public SendableCommandBase {
+class NotifierCommand : public CommandHelper<SendableCommandBase, NotifierCommand> {
  public:
   NotifierCommand(std::function<void()> toRun, double period, wpi::ArrayRef<Subsystem*> requirements) :
     m_notifier{std::move(toRun)}, m_period{period} {
@@ -20,10 +21,6 @@ class NotifierCommand : public SendableCommandBase {
   
   void End(bool interrupted) override {
     m_notifier.Stop();
-  }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<NotifierCommand>(std::move(*this));
   }
  private:
   Notifier m_notifier;

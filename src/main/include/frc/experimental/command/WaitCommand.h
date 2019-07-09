@@ -1,12 +1,13 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandHelper.h"
 #include "frc/Timer.h"
 #include "wpi/Twine.h"
 
 namespace frc {
 namespace experimental {
-class WaitCommand : public SendableCommandBase {
+class WaitCommand : public CommandHelper<SendableCommandBase, WaitCommand> {
  public:
   explicit WaitCommand(double seconds) 
     : m_duration{seconds} {
@@ -34,10 +35,6 @@ class WaitCommand : public SendableCommandBase {
       return true;
     }
  protected:
-  protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<WaitCommand>(std::move(*this));
-  }
   std::unique_ptr<frc::Timer> m_timer;
  private:
   double m_duration;

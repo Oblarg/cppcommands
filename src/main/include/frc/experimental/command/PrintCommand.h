@@ -1,15 +1,16 @@
 #pragma once
 
 #include "InstantCommand.h"
+#include "CommandHelper.h"
 #include "wpi/Twine.h"
 #include "wpi/raw_ostream.h"
 
 namespace frc {
 namespace experimental {
-class PrintCommand : public InstantCommand {
+class PrintCommand : public CommandHelper<InstantCommand, PrintCommand>  {
  public:
   explicit PrintCommand(const wpi::Twine& message) 
-    : InstantCommand{[str = message.str()]{
+    : CommandHelper{[str = message.str()]{
       wpi::outs() << str << "\n";
     }, {}} {
     }
@@ -18,10 +19,6 @@ class PrintCommand : public InstantCommand {
     
   bool RunsWhenDisabled() const override {
     return true;
-  }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<PrintCommand>(std::move(*this));
   }
 };
 }

@@ -1,6 +1,7 @@
-#include <type_traits>
+#pragma once
 
 #include "Command.h"
+#include <type_traits>
 
 namespace frc {
 namespace experimental {

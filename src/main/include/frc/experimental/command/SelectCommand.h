@@ -9,7 +9,8 @@
 namespace frc {
 namespace experimental {
 template <typename Key>
-class SelectCommand : public SendableCommandBase {
+
+class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Key>> {
  public:
   template <class... Types>
   SelectCommand(std::function<Key()> selector, std::pair<Key, Types>... commands) 
@@ -25,7 +26,8 @@ class SelectCommand : public SendableCommandBase {
     }
 
     for (auto&& command : foo) {
-      AddRequirements(command.second->GetRequirements());
+      this->AddRequirements(command.second->GetRequirements());
+
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
@@ -39,7 +41,7 @@ class SelectCommand : public SendableCommandBase {
     }
 
     for (auto&& command : commands) {
-      AddRequirements(command.second->GetRequirements());
+      this->AddRequirements(command.second->GetRequirements());
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }

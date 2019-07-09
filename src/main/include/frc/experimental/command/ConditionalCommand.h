@@ -1,12 +1,12 @@
 #pragma once
 
 #include "SendableCommandBase.h"
-#include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <iostream>
 
 namespace frc {
 namespace experimental {
-class ConditionalCommand : public SendableCommandBase {
+class ConditionalCommand : public CommandHelper<SendableCommandBase, ConditionalCommand> {
  public:
   template <class T1, class T2, 
     typename = std::enable_if_t<std::is_base_of<Command, T1>::value>,
@@ -17,14 +17,6 @@ class ConditionalCommand : public SendableCommandBase {
       condition) {}
 
     ConditionalCommand(ConditionalCommand&& other) = default;
-
-    // ConditionalCommand(ConditionalCommand&& other) 
-    //   : SendableCommandBase(std::move(other)),
-    //   m_onTrue(std::move(other.m_onTrue)), 
-    //   m_onFalse(std::move(other.m_onFalse)),
-    //   m_condition(std::move(other.m_condition)) {
-    //     m_isGrouped = other.m_isGrouped;
-    // }
     
     void Initialize() override {
       if (m_condition()) {
@@ -50,10 +42,6 @@ class ConditionalCommand : public SendableCommandBase {
     bool RunsWhenDisabled() const override {
       return m_selectedCommand->RunsWhenDisabled();
     }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ConditionalCommand>(std::move(*this));
-  }
  private:
   ConditionalCommand(std::unique_ptr<Command>&& onTrue, std::unique_ptr<Command>&& onFalse, std::function<bool()> condition)
     : m_condition{std::move(condition)} {

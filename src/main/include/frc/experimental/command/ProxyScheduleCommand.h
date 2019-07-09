@@ -1,12 +1,13 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandHelper.h"
 #include <wpi/SmallVector.h>
 #include "SetUtilities.h"
 
 namespace frc {
 namespace experimental {
-class ProxyScheduleCommand : public SendableCommandBase {
+class ProxyScheduleCommand : public CommandHelper<SendableCommandBase, ProxyScheduleCommand> {
  public:
   ProxyScheduleCommand(wpi::ArrayRef<Command*> toSchedule) {
     SetInsert(m_toSchedule, toSchedule);
@@ -37,10 +38,6 @@ class ProxyScheduleCommand : public SendableCommandBase {
 
   bool IsFinished() override {
     return m_finished;
-  }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ProxyScheduleCommand>(std::move(*this));
   }
  private:
   wpi::SmallVector<Command*,4> m_toSchedule;

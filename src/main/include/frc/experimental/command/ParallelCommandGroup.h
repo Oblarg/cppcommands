@@ -1,11 +1,12 @@
 #pragma once
 
 #include "CommandGroupBase.h"
+#include "CommandHelper.h"
 #include <unordered_map>
 
 namespace frc {
 namespace experimental {
-class ParallelCommandGroup : public CommandGroupBase {
+class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelCommandGroup> {
  public:
   ParallelCommandGroup(std::vector<std::unique_ptr<Command>>&& commands) {
     AddCommands(std::move(commands));
@@ -66,10 +67,6 @@ class ParallelCommandGroup : public CommandGroupBase {
   bool RunsWhenDisabled() const override {
     return m_runWhenDisabled;
   }
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<ParallelCommandGroup>(std::move(*this));
-  } 
  private:
   void AddCommands(std::vector<std::unique_ptr<Command>>&& commands) override {
     for (auto&& command : commands) {

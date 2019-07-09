@@ -1,10 +1,11 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandHelper.h"
 
 namespace frc {
 namespace experimental {
-class InstantCommand : public SendableCommandBase {
+class InstantCommand : public CommandHelper<SendableCommandBase, InstantCommand> {
  public:
   InstantCommand(std::function<void()> toRun, wpi::ArrayRef<Subsystem*> requirements) : m_toRun{std::move(toRun)} {
     AddRequirements(requirements);
@@ -15,6 +16,10 @@ class InstantCommand : public SendableCommandBase {
   InstantCommand() : m_toRun{[]{}} {
   }
 
+  void b() {
+
+  }
+
   void Initialize() override {
     m_toRun();
   }
@@ -23,10 +28,6 @@ class InstantCommand : public SendableCommandBase {
     return true;
   }
 
- protected:
-  std::unique_ptr<Command> TransferOwnership()&& override {
-    return std::make_unique<InstantCommand>(std::move(*this));
-  }
  private:
   std::function<void()> m_toRun;
 };
