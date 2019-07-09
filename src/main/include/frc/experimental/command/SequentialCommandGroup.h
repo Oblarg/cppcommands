@@ -14,7 +14,7 @@ class SequentialCommandGroup : public CommandHelper<CommandGroupBase, Sequential
     AddCommands(std::move(commands));
   }
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   SequentialCommandGroup(Types&&... commands) {
     AddCommands(std::forward<Types>(commands)...);
   }
@@ -24,7 +24,7 @@ class SequentialCommandGroup : public CommandHelper<CommandGroupBase, Sequential
   //TODO: add copy constructor that makes deep copy?
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);

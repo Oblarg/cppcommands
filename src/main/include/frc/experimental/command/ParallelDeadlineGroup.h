@@ -14,7 +14,8 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
   }
 
   template <class T, class... Types,
-    typename = std::enable_if_t<std::is_base_of<Command, T>::value>>
+    typename = std::enable_if_t<std::is_base_of<Command, T>::value>,
+    typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
     SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
     AddCommands(std::forward<Types>(commands)...);
@@ -25,7 +26,7 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
   //TODO: add copy constructor that makes deep copy?
   ParallelDeadlineGroup(const ParallelDeadlineGroup&) = delete;
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
     ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);

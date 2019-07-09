@@ -12,7 +12,7 @@ template <typename Key>
 
 class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Key>> {
  public:
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   SelectCommand(std::function<Key()> selector, std::pair<Key, Types>... commands) 
     : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SendableCommandBase.h"
+#include "CommandGroupBase.h"
 #include "CommandHelper.h"
 
 namespace frc {

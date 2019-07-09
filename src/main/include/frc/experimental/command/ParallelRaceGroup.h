@@ -12,7 +12,7 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
     AddCommands(std::move(commands));
   }
 
-  template <class... Types>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   ParallelRaceGroup(Types&&... commands) {
     AddCommands(std::forward<Types>(commands)...);
   }
