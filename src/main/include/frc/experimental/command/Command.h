@@ -13,6 +13,7 @@ std::string GetTypeName(const T& type) {
 }
 
 class Subsystem;
+class ParallelRaceGroup;
 class Command {
  public:
   Command() = default;
@@ -23,7 +24,8 @@ class Command {
   virtual void End(bool interrupted);
   virtual bool IsFinished() { return false; }
   virtual wpi::ArrayRef<Subsystem*> GetRequirements() const = 0;
-  // std::unique_ptr<Command> WithTimeout(double seconds)&&;
+
+  ParallelRaceGroup WithTimeout(double seconds)&&;
   // std::unique_ptr<Command> InterruptOn(std::function<bool()> condition)&&;
   // std::unique_ptr<Command> WhenFinished(std::function<void()> toRun)&&;
   // std::unique_ptr<Command> BeforeStarting(std::function<void()> toRun)&&;
@@ -43,6 +45,7 @@ class Command {
   virtual std::string GetName() const;
  protected:
   virtual std::unique_ptr<Command> TransferOwnership()&& = 0;
+
   bool m_isGrouped = false;
 };
 }

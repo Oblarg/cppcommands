@@ -4,8 +4,8 @@
 
 #include "frc/experimental/command/PerpetualCommand.h"
 #include "frc/experimental/command/WaitCommand.h"
-#include "frc/experimental/command/ParallelCommandGroup.h"
 #include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
 #include "frc/experimental/command/ParallelDeadlineGroup.h"
 #include "frc/experimental/command/SequentialCommandGroup.h"
 #include "frc/experimental/command/WaitUntilCommand.h"
@@ -48,9 +48,12 @@ void Command::Initialize() {}
 void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
-// Command* Command::WithTimeout(double seconds) {
-//   return make_unique
-// }
+ParallelRaceGroup Command::WithTimeout(double seconds)&& {
+  std::vector<std::unique_ptr<Command>> foo;
+  foo.emplace_back(std::make_unique<WaitCommand>(seconds));
+  foo.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(foo));
+}
 
 // Command* Command::InterruptOn(std::function<bool()> condition) {
 //   return new ParallelRaceGroup({this, new WaitUntilCommand(std::move(condition))});
