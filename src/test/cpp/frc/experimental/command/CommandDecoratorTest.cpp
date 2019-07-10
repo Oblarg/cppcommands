@@ -3,6 +3,7 @@
 #include "frc/experimental/command/InstantCommand.h"
 #include "frc/experimental/command/ParallelRaceGroup.h"
 #include "frc/experimental/command/SequentialCommandGroup.h"
+#include "frc/experimental/command/PerpetualCommand.h"
 
 using namespace frc::experimental;
 
@@ -77,4 +78,17 @@ TEST_F(CommandDecoratorTest, WhenFinishedTest) {
   
   EXPECT_FALSE(scheduler.IsScheduled(&command));
   EXPECT_TRUE(finished);
+}
+
+TEST_F(CommandDecoratorTest, PerpetuallyTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  auto command = InstantCommand([]{}, {}).Perpetually();
+
+  scheduler.Schedule(&command);
+
+  scheduler.Run();
+  scheduler.Run();
+  
+  EXPECT_TRUE(scheduler.IsScheduled(&command));
 }

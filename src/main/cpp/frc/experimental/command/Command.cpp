@@ -76,37 +76,6 @@ SequentialCommandGroup Command::WhenFinished(std::function<void()> toRun)&& {
   return SequentialCommandGroup(std::move(temp));
 }
 
-template<class... Types, typename>
-SequentialCommandGroup Command::AndThen(Types&&... next)&& {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(next))), ...);
-  return SequentialCommandGroup(std::move(temp));
-}
-
-template<class... Types, typename>
-ParallelDeadlineGroup Command::DeadlineWith(Types&&... parallel)&& {
-  std::vector<std::unique_ptr<Command>> temp;
-  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(parallel))), ...);
-  return ParallelDeadlineGroup(std::move(*this).TransferOwnership(), temp);
-}
-
-template<class... Types, typename>
-ParallelCommandGroup Command::AlongWith(Types&&... parallel)&& {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(parallel))), ...);
-  return ParallelCommandGroup(std::move(temp));
-}
-
-template<class... Types, typename>
-ParallelRaceGroup Command::RaceWith(Types&&... parallel)&& {
-  std::vector<std::unique_ptr<Command>> temp;
-  temp.emplace_back(std::move(*this).TransferOwnership());
-  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(parallel))), ...);
-  return ParallelRaceGroup(std::move(temp));
-}
-
 PerpetualCommand Command::Perpetually()&&  {
   return PerpetualCommand(std::move(*this).TransferOwnership());
 }

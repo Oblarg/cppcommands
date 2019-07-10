@@ -18,6 +18,7 @@ class ParallelRaceGroup;
 class ParallelDeadlineGroup;
 class SequentialCommandGroup;
 class PerpetualCommand;
+
 class Command {
  public:
   Command() = default;
@@ -33,14 +34,6 @@ class Command {
   ParallelRaceGroup InterruptOn(std::function<bool()> condition)&&;
   SequentialCommandGroup BeforeStarting(std::function<void()> toRun)&&;
   SequentialCommandGroup WhenFinished(std::function<void()> toRun)&&;
-  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
-  SequentialCommandGroup AndThen(Types&&... next)&&;
-  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
-  ParallelDeadlineGroup DeadlineWith(Types&&... parallel)&&;
-  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
-  ParallelCommandGroup AlongWith(Types&&... parallel)&&;
-  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
-  ParallelRaceGroup RaceWith(Types&&... parallel)&&;
   PerpetualCommand Perpetually()&&;
   void Schedule(bool interruptible);
   void Schedule() { Schedule(true); }
