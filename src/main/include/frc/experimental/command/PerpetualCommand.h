@@ -8,7 +8,7 @@ namespace frc {
 namespace experimental {
 class PerpetualCommand : public CommandHelper<SendableCommandBase, PerpetualCommand> {
  public:
-  explicit PerpetualCommand(std::unique_ptr<Command> command) {
+  explicit PerpetualCommand(std::unique_ptr<Command>&& command) {
       if (!CommandGroupBase::RequireUngrouped(command)) { 
         return; 
       }

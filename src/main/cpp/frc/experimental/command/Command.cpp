@@ -62,39 +62,54 @@ ParallelRaceGroup Command::InterruptOn(std::function<bool()> condition)&& {
   return ParallelRaceGroup(std::move(temp));
 }
 
-// Command* Command::WhenFinished(std::function<void()> toRun) {
-//   return new SequentialCommandGroup({this, new InstantCommand(std::move(toRun), {})});
-// }
+SequentialCommandGroup Command::WhenFinished(std::function<void()> toRun)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<InstantCommand>(std::move(toRun)));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return SequentialCommandGroup(std::move(temp));
+}
 
-// Command* Command::BeforeStarting(std::function<void()> toRun) {
-//   return new SequentialCommandGroup({new InstantCommand(std::move(toRun), {}), this});
-// }
+SequentialCommandGroup Command::BeforeStarting(std::function<void()> toRun)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  temp.emplace_back(std::make_unique<InstantCommand>(std::move(toRun)));
+  return SequentialCommandGroup(std::move(temp));
+}
 
-// Command* Command::AndThen(wpi::ArrayRef<Command*> next) {
-//   auto group = new SequentialCommandGroup(this);
-//   group->AddCommands({next});
-//   return group;
-// }
+template<class... Types, typename>
+SequentialCommandGroup Command::AndThen(Types&&... next)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(next))), ...);
+  return SequentialCommandGroup(std::move(temp));
+}
 
-// Command* Command::DeadlineWith(wpi::ArrayRef<Command*> parallel) {
-//   return new ParallelDeadlineGroup({this, parallel});
-// }
+template<class... Types, typename>
+ParallelDeadlineGroup Command::DeadlineWith(Types&&... parallel)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(next))), ...);
+  return ParallelDeadlineGroup(std::move(*this).TransferOwnership(), temp);
+}
 
-// Command* Command::AlongWith(wpi::ArrayRef<Command*> parallel) {
-//   auto group = new ParallelCommandGroup(this);
-//   group->AddCommands({parallel});
-//   return group;
-// }
+template<class... Types, typename>
+ParallelCommandGroup Command::AlongWith(Types&&... next)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(next))), ...);
+  return ParallelCommandGroup(std::move(temp));
+}
 
-// Command* Command::RaceWith(wpi::ArrayRef<Command*> parallel) {
-//   auto group = new ParallelRaceGroup(this);
-//   group->AddCommands({parallel});
-//   return group;
-// }
+template<class... Types, typename>
+ParallelRaceGroup Command::RaceWith(Types&&... next)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  ((void)temp.emplace_back(std::make_unique<Types>(std::forward<Types>(next))), ...);
+  return ParallelRaceGroup(std::move(temp));
+}
 
-// Command* Command::Perpetually()  {
-//   return new PerpetualCommand(this);
-// }
+PerpetualCommand Command::Perpetually()&&  {
+  return PerpetualCommand(std::move(*this).TransferOwnership());
+}
 
 void Command::Schedule(bool interruptible) {
   CommandScheduler::GetInstance().Schedule(interruptible, this);

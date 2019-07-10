@@ -13,7 +13,11 @@ std::string GetTypeName(const T& type) {
 }
 
 class Subsystem;
+class ParallelCommandGroup;
 class ParallelRaceGroup;
+class ParallelDeadlineGroup;
+class SequentialCommandGroup;
+class PerpetualCommand;
 class Command {
  public:
   Command() = default;
@@ -27,13 +31,17 @@ class Command {
 
   ParallelRaceGroup WithTimeout(double seconds)&&;
   ParallelRaceGroup InterruptOn(std::function<bool()> condition)&&;
-  // std::unique_ptr<Command> WhenFinished(std::function<void()> toRun)&&;
-  // std::unique_ptr<Command> BeforeStarting(std::function<void()> toRun)&&;
-  // std::unique_ptr<Command> AndThen(std::vector<std::unique_ptr<Command>>&& next)&&;
-  // std::unique_ptr<Command> DeadlineWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
-  // std::unique_ptr<Command> AlongWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
-  // std::unique_ptr<Command> RaceWith(std::vector<std::unique_ptr<Command>>&& parallel)&&;
-  // std::unique_ptr<Command> Perpetually()&&;
+  SequentialCommandGroup WhenFinished(std::function<void()> toRun)&&;
+  SequentialCommandGroup BeforeStarting(std::function<void()> toRun)&&;
+  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  SequentialCommandGroup AndThen(Types&&... next)&&;
+  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  ParallelDeadlineGroup DeadlineWith(Types&&... parallel)&&;
+  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  ParallelCommandGroup AlongWith(Types&&... parallel)&&;
+  template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  ParallelRaceGroup RaceWith(Types&&... parallel)&&;
+  PerpetualCommand Perpetually()&&;
   void Schedule(bool interruptible);
   void Schedule() { Schedule(true); }
   void Cancel();
