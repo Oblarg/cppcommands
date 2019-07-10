@@ -31,8 +31,8 @@ class Command {
 
   ParallelRaceGroup WithTimeout(double seconds)&&;
   ParallelRaceGroup InterruptOn(std::function<bool()> condition)&&;
-  SequentialCommandGroup WhenFinished(std::function<void()> toRun)&&;
   SequentialCommandGroup BeforeStarting(std::function<void()> toRun)&&;
+  SequentialCommandGroup WhenFinished(std::function<void()> toRun)&&;
   template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
   SequentialCommandGroup AndThen(Types&&... next)&&;
   template<class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>

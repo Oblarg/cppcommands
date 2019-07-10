@@ -1,6 +1,8 @@
 #include "CommandTestBase.h"
 #include "frc/experimental/command/RunCommand.h"
+#include "frc/experimental/command/InstantCommand.h"
 #include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/SequentialCommandGroup.h"
 
 using namespace frc::experimental;
 
@@ -37,7 +39,42 @@ TEST_F(CommandDecoratorTest, InterruptOnTest) {
   EXPECT_TRUE(scheduler.IsScheduled(&command));
 
   finished = true;
-  
+
   scheduler.Run();
   EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, BeforeStartingTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool finished = false;
+
+  auto command = InstantCommand([]{}, {}).BeforeStarting([&finished]{finished = true;});
+
+  scheduler.Schedule(&command);
+
+  EXPECT_TRUE(finished);
+
+  scheduler.Run();
+  scheduler.Run();
+  
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+}
+
+TEST_F(CommandDecoratorTest, WhenFinishedTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool finished = false;
+
+  auto command = InstantCommand([]{}, {}).WhenFinished([&finished]{finished = true;});
+
+  scheduler.Schedule(&command);
+
+  EXPECT_FALSE(finished);
+
+  scheduler.Run();
+  scheduler.Run();
+  
+  EXPECT_FALSE(scheduler.IsScheduled(&command));
+  EXPECT_TRUE(finished);
 }
