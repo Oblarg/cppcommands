@@ -26,7 +26,7 @@ class Command {
   virtual wpi::ArrayRef<Subsystem*> GetRequirements() const = 0;
 
   ParallelRaceGroup WithTimeout(double seconds)&&;
-  // std::unique_ptr<Command> InterruptOn(std::function<bool()> condition)&&;
+  ParallelRaceGroup InterruptOn(std::function<bool()> condition)&&;
   // std::unique_ptr<Command> WhenFinished(std::function<void()> toRun)&&;
   // std::unique_ptr<Command> BeforeStarting(std::function<void()> toRun)&&;
   // std::unique_ptr<Command> AndThen(std::vector<std::unique_ptr<Command>>&& next)&&;

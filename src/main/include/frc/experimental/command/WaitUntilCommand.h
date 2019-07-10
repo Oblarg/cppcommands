@@ -1,35 +1,32 @@
-// #pragma once
+#pragma once
 
-// #include "SendableCommandBase.h"
-// #include "frc/Timer.h"
+#include "SendableCommandBase.h"
+#include "frc/experimental/command/CommandHelper.h"
+#include "frc/Timer.h"
 
-// namespace frc {
-// namespace experimental {
-// class WaitUntilCommand : public SendableCommandBase {
-//  public:
-//   explicit WaitUntilCommand(std::function<bool()> condition) 
-//     : m_condition{std::move(condition)} {
-//     }
+namespace frc {
+namespace experimental {
+class WaitUntilCommand : public CommandHelper<SendableCommandBase, WaitUntilCommand> {
+ public:
+  explicit WaitUntilCommand(std::function<bool()> condition) 
+    : m_condition{std::move(condition)} {
+    }
     
-//     explicit WaitUntilCommand(double time) 
-//       : m_condition{[=]{ return Timer::GetMatchTime() - time > 0; }} {
-//     }
+    explicit WaitUntilCommand(double time) 
+      : m_condition{[=]{ return Timer::GetMatchTime() - time > 0; }} {
+    }
     
-//     WaitUntilCommand(WaitUntilCommand&& other) = default;
+    WaitUntilCommand(WaitUntilCommand&& other) = default;
     
-//     bool IsFinished() override {
-//       return m_condition();
-//     }
+    bool IsFinished() override {
+      return m_condition();
+    }
     
-//     bool RunsWhenDisabled() const override {
-//       return true;
-//     }
-//  protected:
-//   std::unique_ptr<Command> TransferOwnership()&& override {
-//     return std::make_unique<WaitUntilCommand>(std::move(*this));
-//   }
-//  private:
-//   std::function<bool()> m_condition;
-// };
-// }
-// }
+    bool RunsWhenDisabled() const override {
+      return true;
+    }
+ private:
+  std::function<bool()> m_condition;
+};
+}
+}

@@ -49,15 +49,18 @@ void Command::Execute() {}
 void Command::End(bool interrupted) {}
 
 ParallelRaceGroup Command::WithTimeout(double seconds)&& {
-  std::vector<std::unique_ptr<Command>> foo;
-  foo.emplace_back(std::make_unique<WaitCommand>(seconds));
-  foo.emplace_back(std::move(*this).TransferOwnership());
-  return ParallelRaceGroup(std::move(foo));
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitCommand>(seconds));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
 }
 
-// Command* Command::InterruptOn(std::function<bool()> condition) {
-//   return new ParallelRaceGroup({this, new WaitUntilCommand(std::move(condition))});
-// }
+ParallelRaceGroup Command::InterruptOn(std::function<bool()> condition)&& {
+  std::vector<std::unique_ptr<Command>> temp;
+  temp.emplace_back(std::make_unique<WaitUntilCommand>(std::move(condition)));
+  temp.emplace_back(std::move(*this).TransferOwnership());
+  return ParallelRaceGroup(std::move(temp));
+}
 
 // Command* Command::WhenFinished(std::function<void()> toRun) {
 //   return new SequentialCommandGroup({this, new InstantCommand(std::move(toRun), {})});
