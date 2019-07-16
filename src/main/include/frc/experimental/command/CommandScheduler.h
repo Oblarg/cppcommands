@@ -27,6 +27,7 @@ class CommandScheduler final : public SendableBase, ErrorBase {
   }
 
   void Schedule(bool interruptible, Command* command);
+  
   void Schedule(bool interruptible, wpi::ArrayRef<Command*> commands) {
     for (auto command : commands) {
       Schedule(interruptible, command);

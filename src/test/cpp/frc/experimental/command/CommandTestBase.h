@@ -38,14 +38,14 @@ class CommandTestBase : public ::testing::Test {
         m_requirements = {};
         EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
         EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(false));
-        EXPECT_CALL(*this, RunsWhenDisabled).WillRepeatedly(::testing::Return(true));
+        EXPECT_CALL(*this, RunsWhenDisabled()).WillRepeatedly(::testing::Return(true));
       };
 
       MockCommand(wpi::ArrayRef<Subsystem*> requirements, bool finished = false, bool runWhenDisabled = true) {
         m_requirements.insert(requirements.begin(), requirements.end());
         EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
         EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(finished));
-        EXPECT_CALL(*this, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
+        EXPECT_CALL(*this, RunsWhenDisabled()).WillRepeatedly(::testing::Return(runWhenDisabled));
       };
 
       MockCommand(MockCommand&& other) = default;

@@ -40,7 +40,7 @@ class ConditionalCommand : public CommandHelper<SendableCommandBase, Conditional
     }
     
     bool RunsWhenDisabled() const override {
-      return m_selectedCommand->RunsWhenDisabled();
+      return m_runsWhenDisabled;
     }
  private:
   ConditionalCommand(std::unique_ptr<Command>&& onTrue, std::unique_ptr<Command>&& onFalse, std::function<bool()> condition)
@@ -55,6 +55,9 @@ class ConditionalCommand : public CommandHelper<SendableCommandBase, Conditional
       m_onTrue->SetGrouped(true);
       m_onFalse->SetGrouped(true);
 
+      m_runsWhenDisabled &= m_onTrue->RunsWhenDisabled();
+      m_runsWhenDisabled &= m_onFalse->RunsWhenDisabled();
+
       AddRequirements(m_onTrue->GetRequirements());
       AddRequirements(m_onFalse->GetRequirements());
   }
@@ -62,6 +65,7 @@ class ConditionalCommand : public CommandHelper<SendableCommandBase, Conditional
   std::unique_ptr<Command> m_onFalse;
   std::function<bool()> m_condition;
   Command* m_selectedCommand{nullptr};
+  bool m_runsWhenDisabled = true;
 };
 }
 }

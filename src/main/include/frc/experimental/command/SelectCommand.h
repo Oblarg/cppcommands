@@ -27,7 +27,7 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
 
     for (auto&& command : foo) {
       this->AddRequirements(command.second->GetRequirements());
-
+      m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
@@ -67,7 +67,7 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
   }
   
   bool RunsWhenDisabled() const override {
-    return m_selectedCommand->RunsWhenDisabled();
+    return m_runsWhenDisabled;
   }
  protected:
   std::unique_ptr<Command> TransferOwnership()&& override {
@@ -78,6 +78,7 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
   std::function<Key()> m_selector;
   std::function<std::unique_ptr<Command>()> m_toRun;
   Command* m_selectedCommand;
+  bool m_runsWhenDisabled = true;
 };
 
 template <typename T>
