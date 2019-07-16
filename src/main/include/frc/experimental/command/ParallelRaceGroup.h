@@ -52,12 +52,18 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
     
     // TODO: Running Group
     
-    // TODO: Disjoint
     for(auto&& command : commands) {
-      command->SetGrouped(true);
-      AddRequirements(command->GetRequirements());
-      m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands.emplace(std::move(command));
+      if(RequirementsDisjoint(this, command.get())) {
+        command->SetGrouped(true);
+        AddRequirements(command->GetRequirements());
+        m_runWhenDisabled &= command->RunsWhenDisabled();
+        m_commands.emplace(std::move(command));
+      }
+      else {
+        wpi_setWPIErrorWithContext(CommandIllegalUse, 
+          "Multiple commands in a parallel group cannot require the same subsystems");
+        return;
+      }
     }
   }
   

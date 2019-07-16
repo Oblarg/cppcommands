@@ -8,7 +8,7 @@
 
 namespace frc {
 namespace experimental {
-class SequentialCommandGroup : public CommandHelper<CommandGroupBase, SequentialCommandGroup>, public ErrorBase {
+class SequentialCommandGroup : public CommandHelper<CommandGroupBase, SequentialCommandGroup> {
  public:
   SequentialCommandGroup(std::vector<std::unique_ptr<Command>>&& commands) {
     AddCommands(std::move(commands));

@@ -2,6 +2,7 @@
 
 #include "SendableCommandBase.h"
 #include <set>
+#include <frc/ErrorBase.h>
 
 namespace frc {
 namespace experimental {

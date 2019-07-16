@@ -4,6 +4,8 @@
 #include <wpi/ArrayRef.h>
 #include <wpi/SmallSet.h>
 #include <frc/experimental/command/Subsystem.h>
+#include <frc/WPIErrors.h>
+#include <frc/ErrorBase.h>
 
 namespace frc {
 namespace experimental {
@@ -20,7 +22,7 @@ class ParallelDeadlineGroup;
 class SequentialCommandGroup;
 class PerpetualCommand;
 
-class Command {
+class Command : public ErrorBase {
  public:
   Command() = default;
   Command(Command&& other) = default;
@@ -50,5 +52,14 @@ class Command {
 
   bool m_isGrouped = false;
 };
+
+static bool RequirementsDisjoint(Command* first, Command* second) {
+  bool disjoint = true;
+  auto&& requirements = second->GetRequirements();
+  for (auto&& requirement : first->GetRequirements()) {
+    disjoint &= requirements.find(requirement) == requirements.end(); 
+  }
+  return disjoint;
+}
 }
 }

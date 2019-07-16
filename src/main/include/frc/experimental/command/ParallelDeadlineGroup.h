@@ -76,10 +76,17 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
     
     // TODO: Disjoint
     for(auto&& command : commands) {
-      command->SetGrouped(true);
-      AddRequirements(command->GetRequirements());
-      m_runWhenDisabled &= command->RunsWhenDisabled();
-      m_commands[std::move(command)] = false;
+      if(RequirementsDisjoint(this, command.get())) {
+        command->SetGrouped(true);
+        AddRequirements(command->GetRequirements());
+        m_runWhenDisabled &= command->RunsWhenDisabled();
+        m_commands[std::move(command)] = false;
+      }
+      else {
+        wpi_setWPIErrorWithContext(CommandIllegalUse, 
+          "Multiple commands in a parallel group cannot require the same subsystems");
+        return;
+      }
     }
   }
 
