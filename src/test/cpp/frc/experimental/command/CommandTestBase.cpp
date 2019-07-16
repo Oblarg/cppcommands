@@ -24,5 +24,12 @@ void CommandTestBase::SetUp() {
 void CommandTestBase::TearDown() {
 }
 
+void CommandTestBase::SetDSEnabled(bool enabled){
+  HALSIM_SetDriverStationEnabled(enabled);
+  while (HALSIM_GetDriverStationEnabled() != enabled) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+  }
+}
+
 }
 }

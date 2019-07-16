@@ -73,6 +73,8 @@ class CommandTestBase : public ::testing::Test {
   virtual void SetUp();
 
   virtual void TearDown();
+
+  void SetDSEnabled(bool enabled);
 };
 }
 }
