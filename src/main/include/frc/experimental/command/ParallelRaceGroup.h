@@ -28,13 +28,31 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
     ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
     AddCommands(std::move(foo));
   }
+
+  void Initialize() override {
+    for (auto& commandRunning : m_commands) {
+      commandRunning->Initialize();
+    }
+    isRunning = true;
+  }
   
+  void Execute() override {
+    for (auto& commandRunning : m_commands) {
+      commandRunning->Execute();
+      if (commandRunning->IsFinished()) {
+        m_finished = true;
+        commandRunning->End(false);
+      }
+    }
+  }
+
   void End(bool interrupted) override {
     for (auto& commandRunning : m_commands) {
       if (!commandRunning->IsFinished()) {
         commandRunning->End(true);
       }
     }
+    isRunning = false;
   }
   
   bool IsFinished() override {
@@ -49,10 +67,13 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
     if (!RequireUngrouped(commands)) {
       return;
     }
+
+    if (isRunning) {
+      wpi_setWPIErrorWithContext(CommandIllegalUse,
+        "Commands cannot be added to a CommandGroup while the group is running");
+    }
     
-    // TODO: Running Group
-    
-    for(auto&& command : commands) {
+    for (auto&& command : commands) {
       if(RequirementsDisjoint(this, command.get())) {
         command->SetGrouped(true);
         AddRequirements(command->GetRequirements());
@@ -66,26 +87,11 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
       }
     }
   }
-  
-  void Initialize() override {
-    for (auto& commandRunning : m_commands) {
-      commandRunning->Initialize();
-    }
-  }
-  
-    void Execute() override {
-    for (auto& commandRunning : m_commands) {
-      commandRunning->Execute();
-      if (commandRunning->IsFinished()) {
-        m_finished = true;
-        commandRunning->End(false);
-      }
-    }
-  }
 
   std::set<std::unique_ptr<Command>> m_commands;
   bool m_runWhenDisabled{true};
   bool m_finished{false};
+  bool isRunning = false;
 };
 }
 }

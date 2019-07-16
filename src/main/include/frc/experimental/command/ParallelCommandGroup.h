@@ -34,6 +34,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
       commandRunning.first->Initialize();
       commandRunning.second = true;
     }
+    isRunning = true;
   }
   
     void Execute() override {
@@ -55,6 +56,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
         }
       }
     }
+    isRunning = false;
   }
   
   bool IsFinished() override {
@@ -73,9 +75,11 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
       if (!RequireUngrouped(*command)) return;
     }
     
-    // TODO: Running Group
+    if (isRunning) {
+      wpi_setWPIErrorWithContext(CommandIllegalUse,
+        "Commands cannot be added to a CommandGroup while the group is running");
+    }
     
-    // TODO: Disjoint
     for(auto&& command : commands) {
       if(RequirementsDisjoint(this, command.get())) {
         command->SetGrouped(true);
@@ -93,6 +97,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
 
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   bool m_runWhenDisabled{true};
+  bool isRunning = false;
 };
 }
 }

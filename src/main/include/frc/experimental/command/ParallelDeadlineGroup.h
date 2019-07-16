@@ -38,6 +38,7 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
       commandRunning.first->Initialize();
       commandRunning.second = true;
     }
+    isRunning = true;
   }
   
   void Execute() override {
@@ -57,6 +58,7 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
         commandRunning.first->End(true);
       }
     }
+    isRunning = false;
   }
   
   bool IsFinished() override {
@@ -72,9 +74,11 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
       return;
     }
     
-    // TODO: Running Group
-    
-    // TODO: Disjoint
+    if (isRunning) {
+      wpi_setWPIErrorWithContext(CommandIllegalUse,
+        "Commands cannot be added to a CommandGroup while the group is running");
+    }
+
     for(auto&& command : commands) {
       if(RequirementsDisjoint(this, command.get())) {
         command->SetGrouped(true);
@@ -101,6 +105,7 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
   std::unordered_map<std::unique_ptr<Command>, bool> m_commands;
   Command* m_deadline;
   bool m_runWhenDisabled{true};
+  bool isRunning = false;
 };
 }
 }
