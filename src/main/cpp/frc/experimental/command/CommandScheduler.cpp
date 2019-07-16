@@ -13,12 +13,6 @@ static bool ContainsKey(const TMap& map, TKey keyToCheck) {
   return map.find(keyToCheck) != map.end();
 }
 
-template<typename T1, typename T2, typename TKey>
-static bool Disjoint(const T1& first, const T2& second, wpi::SmallVectorImpl<TKey>& intersection, bool& allInterruptible) {
-
-  return false;
-}
-
 CommandScheduler::CommandScheduler() {
   SetName("Scheduler");
 }
@@ -45,12 +39,10 @@ void CommandScheduler::Schedule(bool interruptible, Command* command) {
   bool isDisjoint = true;
   bool allInterruptible = true;
   for (auto&& i1 : m_requirements) {
-    for (auto&& i2 : requirements) {
-      if (i1.first == i2) {
-        isDisjoint = false;
-        allInterruptible &= m_scheduledCommands[i1.second].IsInterruptible();
-        intersection.emplace_back(i1.second);
-      }
+    if (requirements.find(i1.first) != requirements.end()) {
+      isDisjoint = false;
+      allInterruptible &= m_scheduledCommands[i1.second].IsInterruptible();
+      intersection.emplace_back(i1.second);
     }
   }
 

@@ -27,7 +27,7 @@ class CommandTestBase : public ::testing::Test {
 
   class MockCommand : public Command {
      public:
-      MOCK_CONST_METHOD0(GetRequirements, wpi::ArrayRef<Subsystem*>());
+      MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
       MOCK_METHOD0(IsFinished, bool());
       MOCK_METHOD0(RunsWhenDisabled, bool());
       MOCK_METHOD0(Initialize, void());
@@ -42,7 +42,7 @@ class CommandTestBase : public ::testing::Test {
       };
 
       MockCommand(wpi::ArrayRef<Subsystem*> requirements, bool finished = false, bool runWhenDisabled = true) {
-        m_requirements = requirements;
+        m_requirements.insert(requirements.begin(), requirements.end());
         EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(m_requirements));
         EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(finished));
         EXPECT_CALL(*this, RunsWhenDisabled).WillRepeatedly(::testing::Return(runWhenDisabled));
@@ -65,7 +65,7 @@ class CommandTestBase : public ::testing::Test {
         return std::make_unique<MockCommand>(std::move(*this));
       }
      private:
-      std::vector<Subsystem*> m_requirements;
+      wpi::SmallSet<Subsystem*, 4> m_requirements;
     };
 
   CommandScheduler GetScheduler();

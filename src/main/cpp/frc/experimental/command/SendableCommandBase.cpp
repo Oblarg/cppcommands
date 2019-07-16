@@ -11,11 +11,15 @@ SendableCommandBase::SendableCommandBase() {
 
 
   void SendableCommandBase::AddRequirements(wpi::ArrayRef<Subsystem*> requirements) {
-    SetInsert(m_requirements, requirements);
+    m_requirements.insert(requirements.begin(), requirements.end());
   }
 
-  wpi::ArrayRef<Subsystem*> SendableCommandBase::GetRequirements() const {
-    return wpi::ArrayRef<Subsystem*>{m_requirements.begin(), m_requirements.end()};
+  void SendableCommandBase::AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements) {
+    m_requirements.insert(requirements.begin(), requirements.end());
+  }
+
+  wpi::SmallSet<Subsystem*, 4> SendableCommandBase::GetRequirements() const {
+    return m_requirements;
   }
 
   void SendableCommandBase::InitSendable(frc::SendableBuilder& builder) {

@@ -3,7 +3,7 @@
 #include <frc/smartdashboard/Sendable.h>
 #include "Command.h"
 #include <wpi/SmallVector.h>
-#include <wpi/SmallPtrSet.h>
+#include <wpi/SmallSet.h>
 
 namespace frc {
 namespace experimental {
@@ -13,7 +13,9 @@ class SendableCommandBase : public Sendable, public Command {
 
   void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
 
-  wpi::ArrayRef<Subsystem*> GetRequirements() const override;
+  void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);
+
+  wpi::SmallSet<Subsystem*, 4> GetRequirements() const override;
 
   void SetName(const wpi::Twine& name) override {
     m_name = name.str();
@@ -38,7 +40,7 @@ class SendableCommandBase : public Sendable, public Command {
   SendableCommandBase();
   std::string m_name;
   std::string m_subsystem;
-  wpi::SmallVector<Subsystem*, 4> m_requirements;
+  wpi::SmallSet<Subsystem*, 4> m_requirements;
 };
 }
 }

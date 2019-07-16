@@ -2,6 +2,8 @@
 
 #include <wpi/Twine.h>
 #include <wpi/ArrayRef.h>
+#include <wpi/SmallSet.h>
+#include <frc/experimental/command/Subsystem.h>
 
 namespace frc {
 namespace experimental {
@@ -12,7 +14,6 @@ std::string GetTypeName(const T& type) {
   return demangle(typeid(type).name());
 }
 
-class Subsystem;
 class ParallelCommandGroup;
 class ParallelRaceGroup;
 class ParallelDeadlineGroup;
@@ -28,7 +29,7 @@ class Command {
   virtual void Execute();
   virtual void End(bool interrupted);
   virtual bool IsFinished() { return false; }
-  virtual wpi::ArrayRef<Subsystem*> GetRequirements() const = 0;
+  virtual wpi::SmallSet<Subsystem*, 4> GetRequirements() const = 0;
 
   ParallelRaceGroup WithTimeout(double seconds)&&;
   ParallelRaceGroup InterruptOn(std::function<bool()> condition)&&;
