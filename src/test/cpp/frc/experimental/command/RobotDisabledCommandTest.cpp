@@ -41,9 +41,6 @@ TEST_F(RobotDisabledCommandTest, RunWhenDisabledTest) {
 
   scheduler.Schedule(&command2);
 
-  std::cout << (&command2)->RunsWhenDisabled();
-  std::cout << "\n \n";
-
   EXPECT_TRUE(scheduler.IsScheduled(&command1));
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
 }

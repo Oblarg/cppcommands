@@ -6,8 +6,6 @@
 #include <frc/smartdashboard/SendableBuilder.h>
 #include <hal/HAL.h>
 
-#include <iostream>
-
 using namespace frc::experimental;
 
 template<typename TMap, typename TKey>
@@ -25,8 +23,6 @@ CommandScheduler& CommandScheduler::GetInstance() {
 }
 
 void CommandScheduler::Schedule(bool interruptible, Command* command) {
-  std::cout << command->RunsWhenDisabled();
-  std::cout << "\n \n";
   if (command->IsGrouped()) {
     wpi_setWPIErrorWithContext(CommandIllegalUse,
         "A command that is part of a command group cannot be independently scheduled");

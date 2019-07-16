@@ -29,7 +29,7 @@ class CommandTestBase : public ::testing::Test {
      public:
       MOCK_CONST_METHOD0(GetRequirements, wpi::SmallSet<Subsystem*, 4>());
       MOCK_METHOD0(IsFinished, bool());
-      MOCK_METHOD0(RunsWhenDisabled, bool());
+      MOCK_CONST_METHOD0(RunsWhenDisabled, bool());
       MOCK_METHOD0(Initialize, void());
       MOCK_METHOD0(Execute, void());
       MOCK_METHOD1(End, void(bool interrupted));
