@@ -12,12 +12,12 @@ template <typename Key>
 
 class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Key>> {
  public:
-  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
   SelectCommand(std::function<Key()> selector, std::pair<Key, Types>... commands) 
     : m_selector{std::move(selector)} {
     std::vector<std::pair<Key, std::unique_ptr<Command>>> foo;
 
-    ((void)foo.emplace_back(commands.first, std::make_unique<Types>(std::move(commands.second))), ...);
+    ((void)foo.emplace_back(commands.first, std::make_unique<std::remove_reference_t<Types>>(std::move(commands.second))), ...);
 
     for(auto&& command : foo) {
       if (!CommandGroupBase::RequireUngrouped(command.second)) {

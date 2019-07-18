@@ -197,6 +197,15 @@ TEST_F(CommandRequirementsTest, SelectCommandRequirementTest) {
   EXPECT_FALSE(scheduler.IsScheduled(&select));
 }
 
+TEST_F(CommandRequirementsTest, FooTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  InstantCommand command1;
+  InstantCommand command2;
+
+  SequentialCommandGroup group(command1, command2);
+}
+
 // TEST_F(CommandRequirementsTest, DefaultCommandRequirementErrorTest) {
 //   TestSubsystem requirement1;
 //   ErrorConfirmer confirmer("require");

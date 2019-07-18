@@ -12,7 +12,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
     AddCommands(std::move(commands));
   }
 
-  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, Types>...>>>
+  template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
   ParallelCommandGroup(Types&&... commands) {
     AddCommands(std::forward<Types>(commands)...);
   }
@@ -25,7 +25,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
   template <class... Types>
   void AddCommands(Types&&... commands) {
     std::vector<std::unique_ptr<Command>> foo;
-    ((void)foo.emplace_back(std::make_unique<Types>(std::forward<Types>(commands))), ...);
+    ((void)foo.emplace_back(std::make_unique<std::remove_reference_t<Types>>(std::forward<Types>(commands))), ...);
     AddCommands(std::move(foo));
   }
   
