@@ -48,7 +48,12 @@ class CommandTestBase : public ::testing::Test {
         EXPECT_CALL(*this, RunsWhenDisabled()).WillRepeatedly(::testing::Return(runWhenDisabled));
       };
 
-      MockCommand(MockCommand&& other) = default;
+      MockCommand(MockCommand&& other)  {
+        EXPECT_CALL(*this, GetRequirements()).WillRepeatedly(::testing::Return(other.m_requirements));
+        EXPECT_CALL(*this, IsFinished()).WillRepeatedly(::testing::Return(other.IsFinished()));
+        EXPECT_CALL(*this, RunsWhenDisabled()).WillRepeatedly(::testing::Return(other.RunsWhenDisabled()));
+        std::swap(m_requirements, other.m_requirements);
+      };
 
       MockCommand(const MockCommand& other) {};
 

@@ -1,4 +1,5 @@
 #include "CommandTestBase.h"
+#include "frc/experimental/command/SequentialCommandGroup.h"
 
 using namespace frc::experimental;
 
@@ -43,4 +44,19 @@ TEST_F(RobotDisabledCommandTest, RunWhenDisabledTest) {
 
   EXPECT_TRUE(scheduler.IsScheduled(&command1));
   EXPECT_TRUE(scheduler.IsScheduled(&command2));
+}
+
+TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  SequentialCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
+  SequentialCommandGroup dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false)};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
 }

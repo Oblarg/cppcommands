@@ -8,7 +8,7 @@ class CommandScheduleTest : public CommandTestBase {
 
 TEST_F(CommandScheduleTest, InstantScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
-  MockCommand command({});
+  MockCommand command;
   
   EXPECT_CALL(command, Initialize());
   EXPECT_CALL(command, Execute());
@@ -23,7 +23,7 @@ TEST_F(CommandScheduleTest, InstantScheduleTest) {
 
 TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
-  MockCommand command({});
+  MockCommand command;
 
   EXPECT_CALL(command, Initialize());
   EXPECT_CALL(command, Execute()).Times(2);
@@ -39,9 +39,9 @@ TEST_F(CommandScheduleTest, SingleIterationScheduleTest) {
 
 TEST_F(CommandScheduleTest, MultiScheduleTest) {
   CommandScheduler scheduler = GetScheduler();
-  MockCommand command1({});
-  MockCommand command2({});
-  MockCommand command3({});
+  MockCommand command1;
+  MockCommand command2;
+  MockCommand command3;
   
   EXPECT_CALL(command1, Initialize());
   EXPECT_CALL(command1, Execute()).Times(2);
@@ -76,7 +76,7 @@ TEST_F(CommandScheduleTest, MultiScheduleTest) {
 
 TEST_F(CommandScheduleTest, SchedulerCancelTest) {
   CommandScheduler scheduler = GetScheduler();
-  MockCommand command({});
+  MockCommand command;
   
   EXPECT_CALL(command, Initialize());
   EXPECT_CALL(command, Execute());
@@ -94,7 +94,7 @@ TEST_F(CommandScheduleTest, SchedulerCancelTest) {
 
 TEST_F(CommandScheduleTest, NotScheduledCancelTest) {
   CommandScheduler scheduler = GetScheduler();
-  MockCommand command({});
+  MockCommand command;
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&command));
 }
