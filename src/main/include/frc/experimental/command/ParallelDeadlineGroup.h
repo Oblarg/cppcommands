@@ -14,10 +14,10 @@ class ParallelDeadlineGroup : public CommandHelper<CommandGroupBase, ParallelDea
   }
 
   template <class T, class... Types,
-    typename = std::enable_if_t<std::is_base_of<Command, T>::value>,
+    typename = std::enable_if_t<std::is_base_of<Command, std::remove_reference_t<T>>::value>,
     typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, std::remove_reference_t<Types>>...>>>
   ParallelDeadlineGroup(T&& deadline, Types&&... commands) {
-    SetDeadline(std::make_unique<T>(std::forward<T>(deadline)));
+    SetDeadline(std::make_unique<std::remove_reference_t<T>>(std::forward<T>(deadline)));
     AddCommands(std::forward<Types>(commands)...);
   }
 

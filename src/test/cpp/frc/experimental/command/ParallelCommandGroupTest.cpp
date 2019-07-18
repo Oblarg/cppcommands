@@ -1,6 +1,7 @@
 #include "CommandTestBase.h"
 #include "frc/experimental/command/ParallelCommandGroup.h"
 #include "frc/experimental/command/InstantCommand.h"
+#include "frc/experimental/command/WaitUntilCommand.h"
 
 using namespace frc::experimental;
 
@@ -73,4 +74,20 @@ TEST_F(ParallelCommandGroupTest, ParallelGroupNotScheduledCancelTest){
   ParallelCommandGroup group((InstantCommand(), InstantCommand()));
 
   EXPECT_NO_FATAL_FAILURE(scheduler.Cancel(&group));
+}
+
+TEST_F(ParallelCommandGroupTest, ParallelGroupCopyTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  bool finished = false;
+
+  WaitUntilCommand command([&finished]{return finished;});
+
+  ParallelCommandGroup group(command);
+  scheduler.Schedule(&group);
+  scheduler.Run();
+  EXPECT_TRUE(scheduler.IsScheduled(&group));
+  finished = true;
+  scheduler.Run();
+  EXPECT_FALSE(scheduler.IsScheduled(&group));
 }
