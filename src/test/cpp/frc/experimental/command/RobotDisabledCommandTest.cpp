@@ -1,5 +1,11 @@
 #include "CommandTestBase.h"
 #include "frc/experimental/command/SequentialCommandGroup.h"
+#include "frc/experimental/command/ParallelCommandGroup.h"
+#include "frc/experimental/command/ParallelRaceGroup.h"
+#include "frc/experimental/command/ParallelDeadlineGroup.h"
+#include "frc/experimental/command/ConditionalCommand.h"
+#include "frc/experimental/command/SelectCommand.h"
+
 
 using namespace frc::experimental;
 
@@ -51,6 +57,85 @@ TEST_F(RobotDisabledCommandTest, SequentialGroupRunWhenDisabledTest) {
 
   SequentialCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
   SequentialCommandGroup dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false)};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
+}
+
+TEST_F(RobotDisabledCommandTest, ParallelGroupRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  ParallelCommandGroup runWhenDisabled{MockCommand(), MockCommand()};
+  ParallelCommandGroup dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false)};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
+}
+
+TEST_F(RobotDisabledCommandTest, ParallelRaceRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  ParallelRaceGroup runWhenDisabled{MockCommand(), MockCommand()};
+  ParallelRaceGroup dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false)};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
+}
+
+TEST_F(RobotDisabledCommandTest, ParallelDeadlineRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  ParallelDeadlineGroup runWhenDisabled{MockCommand(), MockCommand()};
+  ParallelDeadlineGroup dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false)};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
+}
+
+TEST_F(RobotDisabledCommandTest, ConditionalCommandRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  ConditionalCommand runWhenDisabled{MockCommand(), MockCommand(), []{return true;}};
+  ConditionalCommand dontRunWhenDisabled{MockCommand(), MockCommand({}, false, false), []{return true;}};
+
+  SetDSEnabled(false);
+
+  scheduler.Schedule(&runWhenDisabled);
+  scheduler.Schedule(&dontRunWhenDisabled);
+
+  EXPECT_TRUE(scheduler.IsScheduled(&runWhenDisabled));
+  EXPECT_FALSE(scheduler.IsScheduled(&dontRunWhenDisabled));
+}
+
+TEST_F(RobotDisabledCommandTest, SelectCommandRunWhenDisabledTest) {
+  CommandScheduler scheduler = GetScheduler();
+
+  SelectCommand<int> runWhenDisabled{[]{return 1;},
+    std::pair(1, MockCommand()), 
+    std::pair(1, MockCommand())};
+  SelectCommand<int> dontRunWhenDisabled{[]{return 1;},
+    std::pair(1, MockCommand()), 
+    std::pair(1, MockCommand({}, false, false))};
 
   SetDSEnabled(false);
 
