@@ -14,9 +14,7 @@ class RunCommand : public CommandHelper<SendableCommandBase, RunCommand> {
 
   RunCommand(RunCommand&& other) = default;
 
-  RunCommand(const RunCommand& other) : CommandHelper(other) {
-    m_toRun = other.m_toRun;
-  };
+  RunCommand(const RunCommand& other) = default;
     
   void Execute() override {
     m_toRun();

@@ -13,12 +13,7 @@ class FunctionalCommand : public CommandHelper<SendableCommandBase, FunctionalCo
 
     FunctionalCommand(FunctionalCommand&& other) = default;
 
-    FunctionalCommand(const FunctionalCommand& other) : CommandHelper(other) {
-      m_onInit = other.m_onInit;
-      m_onExecute = other.m_onExecute;
-      m_onEnd = other.m_onEnd;
-      m_isFinished = other.m_isFinished;
-    };
+    FunctionalCommand(const FunctionalCommand& other) = default;
     
     void Initialize() override {
       m_onInit();

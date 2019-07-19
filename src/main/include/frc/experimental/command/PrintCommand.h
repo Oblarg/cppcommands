@@ -17,7 +17,7 @@ class PrintCommand : public CommandHelper<InstantCommand, PrintCommand>  {
 
   PrintCommand(PrintCommand&& other) = default;
 
-  PrintCommand(const PrintCommand& other) : CommandHelper(other) {};
+  PrintCommand(const PrintCommand& other) = default;
     
   bool RunsWhenDisabled() const override {
     return true;
