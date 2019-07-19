@@ -13,6 +13,11 @@ class StartEndCommand : public CommandHelper<SendableCommandBase, StartEndComman
   }
 
   StartEndCommand(StartEndCommand&& other) = default;
+
+  StartEndCommand(const StartEndCommand& other) : CommandHelper(other) {
+    m_onInit = other.m_onInit;
+    m_onEnd = other.m_onEnd;
+  };
   
   void Initialize() override {
     m_onInit();

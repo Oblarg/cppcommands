@@ -1,4 +1,5 @@
 #include "CommandTestBase.h"
+#include "frc/experimental/command/FunctionalCommand.h"
 
 using namespace frc::experimental;
 

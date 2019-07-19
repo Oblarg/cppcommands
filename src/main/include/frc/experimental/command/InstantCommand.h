@@ -13,11 +13,8 @@ class InstantCommand : public CommandHelper<SendableCommandBase, InstantCommand>
 
   InstantCommand(InstantCommand&& other) = default;
 
-  InstantCommand(const InstantCommand& other) {
+  InstantCommand(const InstantCommand& other) : CommandHelper(other) {
     m_toRun = other.m_toRun;
-    m_name = other.m_name;
-    m_requirements = other.m_requirements;
-    m_subsystem = other.m_subsystem;
   };
 
   InstantCommand() : m_toRun{[]{}} {

@@ -17,6 +17,9 @@ class ConditionalCommand : public CommandHelper<SendableCommandBase, Conditional
       condition) {}
 
     ConditionalCommand(ConditionalCommand&& other) = default;
+
+    //No copy constructors for command groups
+    ConditionalCommand(const ConditionalCommand& other) = delete;
     
     void Initialize() override {
       if (m_condition()) {

@@ -9,13 +9,15 @@ namespace frc {
 namespace experimental {
 class PrintCommand : public CommandHelper<InstantCommand, PrintCommand>  {
  public:
-  explicit PrintCommand(const wpi::Twine& message) 
+  PrintCommand(const wpi::Twine& message) 
     : CommandHelper{[str = message.str()]{
       wpi::outs() << str << "\n";
     }, {}} {
     }
 
   PrintCommand(PrintCommand&& other) = default;
+
+  PrintCommand(const PrintCommand& other) : CommandHelper(other) {};
     
   bool RunsWhenDisabled() const override {
     return true;

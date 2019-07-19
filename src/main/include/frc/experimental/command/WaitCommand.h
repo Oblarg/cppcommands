@@ -17,6 +17,11 @@ class WaitCommand : public CommandHelper<SendableCommandBase, WaitCommand> {
     }
 
     WaitCommand(WaitCommand&& other) = default;
+
+    WaitCommand(const WaitCommand& other) : CommandHelper(other) {
+      m_duration = other.m_duration;
+      m_timer = std::make_unique<frc::Timer>();
+    };
     
     void Initialize() override {
       m_timer->Reset();

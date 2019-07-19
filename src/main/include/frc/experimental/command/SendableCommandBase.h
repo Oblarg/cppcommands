@@ -11,6 +11,12 @@ class SendableCommandBase : public Sendable, public Command {
  public:
   SendableCommandBase(SendableCommandBase&& other) = default;
 
+  SendableCommandBase(const SendableCommandBase& other) {
+    m_name = other.m_name;
+    m_subsystem = other.m_subsystem;
+    m_requirements = other.m_requirements;
+  };
+
   void AddRequirements(wpi::ArrayRef<Subsystem*> requirements);
 
   void AddRequirements(wpi::SmallSet<Subsystem*, 4> requirements);

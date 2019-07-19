@@ -18,11 +18,8 @@ class WaitUntilCommand : public CommandHelper<SendableCommandBase, WaitUntilComm
     
     WaitUntilCommand(WaitUntilCommand&& other) = default;
 
-    WaitUntilCommand(const WaitUntilCommand& other) {
+    WaitUntilCommand(const WaitUntilCommand& other) : CommandHelper(other) {
       m_condition = other.m_condition;
-      m_name = other.m_name;
-      m_requirements = other.m_requirements;
-      m_subsystem = other.m_subsystem;
     };
     
     bool IsFinished() override {

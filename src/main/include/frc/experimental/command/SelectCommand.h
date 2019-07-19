@@ -45,8 +45,11 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
+
+  //No copy constructors for command groups
+  SelectCommand(const SelectCommand& other) = delete;
   
-  explicit SelectCommand(std::function<Command*()> toRun) 
+  SelectCommand(std::function<Command*()> toRun) 
     : m_toRun{toRun} {
   }
 

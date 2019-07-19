@@ -8,16 +8,23 @@ namespace frc {
 namespace experimental {
 class PerpetualCommand : public CommandHelper<SendableCommandBase, PerpetualCommand> {
  public:
-  explicit PerpetualCommand(std::unique_ptr<Command>&& command) {
+  PerpetualCommand(std::unique_ptr<Command>&& command) {
       if (!CommandGroupBase::RequireUngrouped(command)) { 
         return; 
       }
       m_command = std::move(command);
       m_command->SetGrouped(true);
       AddRequirements(m_command->GetRequirements());
-    }
+  }
+
+  template<class T>
+  PerpetualCommand(T&& command) 
+    : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(std::forward<T>(command))) {};
 
   PerpetualCommand(PerpetualCommand&& other) = default;
+
+  //No copy constructors for command groups
+  PerpetualCommand(const PerpetualCommand& other) = delete;
     
   void Initialize() override {
     m_command->Initialize();

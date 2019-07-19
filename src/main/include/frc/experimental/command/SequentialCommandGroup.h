@@ -21,7 +21,7 @@ class SequentialCommandGroup : public CommandHelper<CommandGroupBase, Sequential
 
   SequentialCommandGroup(SequentialCommandGroup&& other) = default;
   
-  //TODO: add copy constructor that makes deep copy?
+  //No copy constructors for command groups
   SequentialCommandGroup(const SequentialCommandGroup&) = delete;
 
   template <class... Types, typename = std::enable_if_t<std::conjunction_v<std::is_base_of<Command, std::remove_reference_t<Types>>...>>>

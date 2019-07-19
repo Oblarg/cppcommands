@@ -19,7 +19,7 @@ class ParallelCommandGroup : public CommandHelper<CommandGroupBase, ParallelComm
 
   ParallelCommandGroup(ParallelCommandGroup&& other) = default;
 
-  //TODO: add copy constructor that makes a deep copy?
+  //No copy constructors for commandgroups
   ParallelCommandGroup(const ParallelCommandGroup&) = delete;
 
   template <class... Types>

@@ -14,6 +14,10 @@ class ScheduleCommand : public CommandHelper<SendableCommandBase, ScheduleComman
   }
 
   ScheduleCommand(ScheduleCommand&& other) = default;
+
+  ScheduleCommand(const ScheduleCommand& other) : CommandHelper(other) {
+    m_toSchedule = other.m_toSchedule;
+  };
   
   void Initialize() override {
     for (auto command : m_toSchedule) {

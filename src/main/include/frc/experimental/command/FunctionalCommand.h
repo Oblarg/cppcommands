@@ -7,11 +7,18 @@ namespace frc {
 namespace experimental {
 class FunctionalCommand : public CommandHelper<SendableCommandBase, FunctionalCommand> {
  public:
-  FunctionalCommand(std::function<void()> onInit, std::function<void()> onExecute, std::function<void(bool)> onEnd, std::function<bool()> isFinished)
+    FunctionalCommand(std::function<void()> onInit, std::function<void()> onExecute, std::function<void(bool)> onEnd, std::function<bool()> isFinished)
     : m_onInit{std::move(onInit)}, m_onExecute{std::move(onExecute)}, m_onEnd{std::move(onEnd)}, m_isFinished{std::move(isFinished)} {
     }
 
     FunctionalCommand(FunctionalCommand&& other) = default;
+
+    FunctionalCommand(const FunctionalCommand& other) : CommandHelper(other) {
+      m_onInit = other.m_onInit;
+      m_onExecute = other.m_onExecute;
+      m_onEnd = other.m_onEnd;
+      m_isFinished = other.m_isFinished;
+    };
     
     void Initialize() override {
       m_onInit();

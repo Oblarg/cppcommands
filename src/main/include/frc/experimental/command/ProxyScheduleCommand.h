@@ -15,6 +15,10 @@ class ProxyScheduleCommand : public CommandHelper<SendableCommandBase, ProxySche
 
   ProxyScheduleCommand(ProxyScheduleCommand&& other) = default;
 
+  ProxyScheduleCommand(const ProxyScheduleCommand& other) : CommandHelper(other) {
+    m_toSchedule = other.m_toSchedule;
+  };
+
   void Initialize() override {
     m_finished = false;
     for (auto* command : m_toSchedule) {

@@ -19,7 +19,7 @@ class ParallelRaceGroup : public CommandHelper<CommandGroupBase, ParallelRaceGro
 
   ParallelRaceGroup(ParallelRaceGroup&& other) = default;
 
-  //TODO: add copy constructor that makes deep copy?
+  //No copy constructors for command groups
   ParallelRaceGroup(const ParallelRaceGroup&) = delete;
   
   template <class... Types>
