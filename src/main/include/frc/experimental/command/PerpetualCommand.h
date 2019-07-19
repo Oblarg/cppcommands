@@ -17,7 +17,8 @@ class PerpetualCommand : public CommandHelper<SendableCommandBase, PerpetualComm
       AddRequirements(m_command->GetRequirements());
   }
 
-  template<class T>
+  template<class T, 
+    typename = std::enable_if_t<std::is_base_of<Command, std::remove_reference_t<T>>::value>>
   PerpetualCommand(T&& command) 
     : PerpetualCommand(std::make_unique<std::remove_reference_t<T>>(std::forward<T>(command))) {};
 
