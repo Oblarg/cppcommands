@@ -32,7 +32,7 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
     }
   }
 
-  SelectCommand(std::function<Key()> selector, std::initializer_list<std::pair<Key, std::unique_ptr<Command>>>&& commands) 
+  SelectCommand(std::function<Key()> selector, std::vector<std::pair<Key, std::unique_ptr<Command>>>&& commands) 
     : m_selector{std::move(selector)} {
     for (auto&& command : commands) {
       if (!CommandGroupBase::RequireUngrouped(command.second)) {
@@ -42,6 +42,7 @@ class SelectCommand : public CommandHelper<SendableCommandBase, SelectCommand<Ke
 
     for (auto&& command : commands) {
       this->AddRequirements(command.second->GetRequirements());
+      m_runsWhenDisabled &= command.second->RunsWhenDisabled();
       m_commands.emplace(std::move(command.first), std::move(command.second));
     }
   }
